@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 smol = "2.0.2"
+mews = { version = "0.5.2", features = ["smol"] }
+git2 = "0.20.2"
 
 [[bin]]
 name="git-pit"
