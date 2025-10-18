@@ -27,17 +27,17 @@ async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
 				while let Some(msg) = smol::stream::StreamExt::next(&mut websocket).await{
 					match msg {
 						Ok(Message::Text(text)) => {
-							println!("Recieved from {addr}: {text}"); 
-							//this is where you'd call worker function, then send back to addr
-							//call gitrunner
-							//gitrunner should execute given git function, then return Success or Failure
-							//Success/Failure should then be sent over to the JS/HTML
-							if websocket.send(Message::Text(format!("Echo: {text}").into())).await.is_err() {
-								println!("Failed to send message to {addr}");
-								break;
-							}
-							
-						}
+                            println!("Recieved from {addr}: {text}"); 
+                            //this is where you'd call worker function, then send back to addr
+                            //call gitrunner
+                            let parser = Parser::new();
+                            let message: String = parser.parse(text);
+                            //Success/Failure should then be sent over to the JS/HTML
+                            if websocket.send(Message::Text(format!("{message}").into())).await.is_err() {
+                                println!("Failed to send message to {addr}");
+                                break;
+                            }
+                        }
 						Ok(Message::Binary(bin)) => {
 							println!("Binary data from {addr}: {bin:?}");
 						}
