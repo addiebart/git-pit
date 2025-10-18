@@ -1,3 +1,3 @@
 //structs/mod.rs
-pub mod git
-pub mod socket
+pub mod git;
+pub mod socket;
