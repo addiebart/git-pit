@@ -3,6 +3,8 @@ use smol::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpListener, net::TcpStream
 use async_tungstenite::accept_async;            
 use async_tungstenite::tungstenite::protocol::Message;  
 use smol::prelude::*;
+mod structs;
+use structs::git::Parser
 
 fn main() -> std::io::Result<()> {
     smol::block_on(async {

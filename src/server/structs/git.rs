@@ -5,6 +5,12 @@ pub struct GitRunner{
 	command_queue: Vec<String>,
 	repo: Repository
 }
+
+pub struct Parser{
+	git_runner: Option<GitRunner>
+	
+}
+
 impl GitRunner{
 	//init will create a repo
 	pub fn init() -> Result<GitRunner, Error>{
@@ -24,7 +30,7 @@ impl GitRunner{
 	}
 	
 	//git config username will change the users name 
-	pub fn git_config_username (username: String ) -> Result<_, Error>{
+	pub fn git_config_username (&mut self, username: String ) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let mut config = repo.config()?;
 		config.set_str("user.name", username)?;
@@ -33,7 +39,7 @@ impl GitRunner{
 	}
 	
 	//git config email will change the users email 
-	pub fn git_config_email (email: String) -> Result<_, Error>{
+	pub fn git_config_email (&mut self, email: String) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let mut config = repo.config()?;
 		config.set_str("user.email", email)?;
@@ -42,7 +48,7 @@ impl GitRunner{
 	}
 	
 	//we adding
-	pub fn git_add (filename: String) -> Result<_, Error>{
+	pub fn git_add (&mut self, filename: String) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let mut index = repo.index()?;
 		match index {
@@ -63,7 +69,7 @@ impl GitRunner{
 	}
 	
 	//we commiting
-	pub fn git_commit(message: String) -> Result<_, Error>{
+	pub fn git_commit(&mut self, message: String) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let sig = repo.signature()?; 
 		let mut index = repo.index()?;
@@ -86,10 +92,10 @@ impl GitRunner{
 		Ok(())
 	}	
 	
-	//implement a fake "git push"
+	//implement a fake "git push": TODO
 	
 	//resets last commit
-	pub fn git_reset(compiler_flag: String) -> Result<_, Error>{
+	pub fn git_reset(&mut self, compiler_flag: String) -> Result<_, Error>{
 		let repo = Repository.open(".")?;
 		let target_commit = repo.revparse_single("HEAD~1")?; //hard-codes it so only the last commit is reset
 		match compiler_flag:
@@ -98,8 +104,67 @@ impl GitRunner{
 		Ok(())
 	}	
 	
+	pub fn git_checkout(&mut self, branch_name: String) -> Result<_, Error> {
+		
+			
+	}
 	
+	pub fn git_branch(&mut self, branch_name: String) -> Result<_, Error> {
+		
+		
+	}
+
+	pub fn git_merge(&mut self, branch_name: String) -> Result<_, Error> {
+		
+		
+	}
+	
+	//executes git -a branch
+	pub fn git_branch_namecheck(&mut self) -> Result<_, Error> {
+		
+	}
+	
+	pub fn git_branch_show_current(&mut self) -> Result<_, Error> {
+		
+	}
+	
+	pub fn git_log_follow(&mut self) -> Result<_, Error> {
+		
+	}
+	
+	pub fn git stash(&mut self) -> Result<_, Error> {
+		
+	}
 }
 
+impl Parser{
+	pub fn new(){
+		Self{git_runner = None}
+	}
+	
+	pub fn parse(&mut self, input: String) -> output: String{
+		//make sure str starts with git
+		if !input.starts_with("git"){
+			return String::from"Invalid command- give me a git command, goddamnit!";
+		}
+		
+		//seeing what thing you're calling
+		match input:
+			"git init" => {
+				self.git_runner = Some(GitRunner::init());
+				return String::from"Git repo created!";
+			}
+			
+		if input.contains("git config user.name"){
+			return self.git_runner.git_config_username(input[11..input.len() - 2])
+		}
+		if input.contains("git config user.email"){
+			return self.git_runner.git_config_email(input[11..input.len() - 2])
+		}
+		
+		return String::from "Invalid command!";
+	}	
+	
+}	
 //Git struct
 //creating
