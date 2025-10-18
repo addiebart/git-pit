@@ -30,6 +30,9 @@ async fn handle_connection(stream: async_net::TcpStream, addr: std::net::SocketA
 						Ok(Message::Text(text)) => {
 							println!("Recieved from {addr}: {text}"); 
 							//this is where you'd call worker function, then send back to addr
+							//call gitrunner
+							//gitrunner should execute given git function, then return Success or Failure
+							//Success/Failure should then be sent over to the JS/HTML
 							if websocket.send(Message::Text(format!("Echo: {text}"))).await.is_err() {
 								println!("Failed to send message to {addr}");
 								break;
