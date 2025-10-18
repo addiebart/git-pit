@@ -61,17 +61,26 @@ async fn parse_http(stream: &mut TcpStream) -> std::io::Result<Request<()>>{
 	req.body(()).map_err(|e| Error::new(ErrorKind::NotFound, "Builder error when trying to make request!"))
 }
 async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) -> std::io::Result<()>{
-	let parser = parse_http(&mut stream).await?;
-	if let Some(key) = parser.headers().get("Sec-WebSocket-Key"){
+	let http_parser = parse_http(&mut stream).await?;
+	if let Some(key) = http_parser.headers().get("Sec-WebSocket-Key"){
 		match key.to_str(){
 			Ok(sec_key) =>{
 				let ctx = WebSocketContext::new(sec_key);
 				let (sign, ws) = ctx.on_upgrade(
 					move |mut conn: Connection<TcpStream>| async move {
+						let mut parser = Parser::new();
 						while let Ok(Some(msg)) = conn.recv().await {
 							match msg {
 								mews::Message::Text(text) => {
 									println!("Recieved text from {addr}: {text}");
+									//this is where you'd call worker function, then send back to addr
+									//call gitrunner
+									let message: String = parser.parse(text.to_string());
+									//Success/Failure should then be sent over to the JS/HTML
+									if conn.send(mews::Message::Text(format!("{message}").into())).await.is_err() {
+										println!("Failed to send message to {addr}");
+										break;
+									}
 								}
 								mews::Message::Binary(bin) => {
 									println!("Recieved binary from {addr}: {bin:?}");
