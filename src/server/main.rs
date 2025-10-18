@@ -4,7 +4,7 @@ use async_tungstenite::accept_async;
 use async_tungstenite::tungstenite::protocol::Message;  
 use smol::prelude::*;
 mod structs;
-use structs::git::Parser
+use structs::git::Parser;
 
 fn main() -> std::io::Result<()> {
     smol::block_on(async {
@@ -30,8 +30,8 @@ async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
                             println!("Recieved from {addr}: {text}"); 
                             //this is where you'd call worker function, then send back to addr
                             //call gitrunner
-                            let parser = Parser::new();
-                            let message: String = parser.parse(text);
+                            let mut parser = Parser::new();
+                            let message: String = parser.parse(text.to_string());
                             //Success/Failure should then be sent over to the JS/HTML
                             if websocket.send(Message::Text(format!("{message}").into())).await.is_err() {
                                 println!("Failed to send message to {addr}");

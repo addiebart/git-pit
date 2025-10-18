@@ -1,7 +1,6 @@
 import React from "react";
 import { faCodeBranch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import CommandWebsocketManager from "./CommandWebsocketManager";
 
 export default function({ onSubmit }: { onSubmit: (value: string) => void }) {
 
@@ -24,6 +23,7 @@ export default function({ onSubmit }: { onSubmit: (value: string) => void }) {
                         type="text"
                         name="shellprompt"
                         id="shellprompt"
+                        autoComplete="off"
                         maxLength={50}
                         className="flex-1 min-w-0 bg-transparent border-0 focus:outline-none p-0 m-0 text-[inherit]"
                     />
