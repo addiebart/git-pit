@@ -30,8 +30,6 @@ async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
 							println!("Recieved from {addr}: {text}"); 
 							//this is where you'd call worker function, then send back to addr
 							//call gitrunner
-							let parser = Parser::new();
-							
 							//gitrunner should execute given git function, then return Success or Failure
 							//Success/Failure should then be sent over to the JS/HTML
 							if websocket.send(Message::Text(format!("Echo: {text}").into())).await.is_err() {

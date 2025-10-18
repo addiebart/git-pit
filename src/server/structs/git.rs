@@ -156,10 +156,10 @@ impl Parser{
 			}
 			
 		if input.contains("git config user.name"){
-			return self.git_runner.git_config_username(input[11:input.len() - 2])
+			return self.git_runner.git_config_username(input[11..input.len() - 2])
 		}
 		if input.contains("git config user.email"){
-			return self.git_runner.git_config_email(input[11:input.len() - 2])
+			return self.git_runner.git_config_email(input[11..input.len() - 2])
 		}
 		
 		return String::from "Invalid command!";
