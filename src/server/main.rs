@@ -4,22 +4,23 @@ use async_tungstenite::accept_async;
 use async_tungstenite::tungstenite::protocol::Message;  
 use smol::prelude::*;
 mod structs;
-use structs::git::Parser;
+use structs::git::{Parser, GitRunner};
 
 fn main() -> std::io::Result<()> {
     smol::block_on(async {
         let listener = TcpListener::bind("127.0.0.1:8081").await?;
         println!("Websocket server listening @ {:?}", listener.local_addr());
-
         loop {
             let (stream, addr) = listener.accept().await?;
 			println!("New tcp connection from {addr}");
 			smol::spawn(handle_connection(stream, addr)).detach();
         }
+		GitRunner::uninit();
 	})
 }
 
 async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
+	let mut parser = Parser::new();
 	match accept_async(stream).await{
 		Ok(mut websocket) => {
 				println!("websocketconnectionestablished with {addr}");
@@ -30,7 +31,6 @@ async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
                             println!("Recieved from {addr}: {text}"); 
                             //this is where you'd call worker function, then send back to addr
                             //call gitrunner
-                            let mut parser = Parser::new();
                             let message: String = parser.parse(text.to_string());
                             //Success/Failure should then be sent over to the JS/HTML
                             if websocket.send(Message::Text(format!("{message}").into())).await.is_err() {
@@ -48,8 +48,8 @@ async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
 						_ => {}	
 					}	
 				}
-			}
-		Err(e) => eprintln!("Failed WebSocket handshake with {addr}: {e:?}"),
-		}	
-	}
+		}
+	Err(e) => eprintln!("Failed WebSocket handshake with {addr}: {e:?}"),
+	}	
+}
 

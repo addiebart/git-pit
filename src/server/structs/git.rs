@@ -7,7 +7,7 @@ pub struct GitRunner{
 }
 
 pub struct Parser{
-	git_runner: Option<GitRunner>
+	pub git_runner: Option<GitRunner>
 	
 }
 
@@ -48,11 +48,10 @@ impl GitRunner{
 	}
 	
 	//we adding
-	/*
-	pub fn git_add (&mut self, filename: String) -> Result<_, Error>{
+	pub fn git_add (&mut self, filename: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
 		let mut index = repo.index()?;
-		match index {
+		match filename.as_str() {
 			"." => {
 				let mut status_opts = StatusOptions::new();
 				let statuses = repo.statuses(Some(&mut status_opts))?;
@@ -62,13 +61,13 @@ impl GitRunner{
 					}
 				}
 			},
-			_ => index.add_path(std::path::Path::new(filename))?,
+			_ => index.add_path(std::path::Path::new(&filename))?,
 		}
 		index.write()?;
 		println!("add staged");
 		Ok(())
 	}
-	*/
+
 	//we commiting
 	pub fn git_commit(&mut self, message: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
@@ -93,7 +92,6 @@ impl GitRunner{
 		Ok(())
 	}	
 	
-	//implement git pull, git pull from origin
 	
 	//resets last commit
 	pub fn git_reset(&mut self, compiler_flag: String) -> Result<(), Error>{
@@ -105,6 +103,16 @@ impl GitRunner{
 		}
 		Ok(())
 	}	
+	
+	pub fn pull(&mut self) -> Result<(), Error> {
+		Ok(())
+			
+	}
+	
+	pub fn git_clone(&mut self, url: String) -> Result<(), Error> {
+		Ok(())
+			
+	}
 	
 	pub fn git_checkout(&mut self, branch_name: String) -> Result<(), Error> {
 		Ok(())
@@ -157,16 +165,32 @@ impl Parser{
 					self.git_runner = Some(runner);
 				}
 				return String::from("Git repo created!");
-			}
-			_ => {return String::from("Repo creation unsuccessful")}
+			},
+			_ => {},
 		}
 		if input.contains("git config user.name"){
-			self.git_runner.unwrap().git_config_username(input[11..input.len() - 2].to_string());
+			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
 			return String::from("Username successfully changed");
 		}
 		if input.contains("git config user.email"){
-			self.git_runner.unwrap().git_config_email(input[11..input.len() - 2].to_string());
+			self.git_runner.as_mut().unwrap().git_config_email(input[11..input.len() - 1].to_string());
 			return String::from("Email successfully changed");
+		}
+		if input.contains("git add"){
+			let substr = input[7..input.len()].to_string();
+			self.git_runner.as_mut().unwrap().git_add(substr);
+			return String::from("Add");
+		}
+		if input.contains("git commit -m"){
+			let substr = input[14..input.len() - 1].to_string();
+			self.git_runner.as_mut().unwrap().git_commit(substr);
+			return String::from("Commit");
+		}
+		
+		if input.contains("git reset"){
+			let substr = input[11..17].to_string();
+			self.git_runner.as_mut().unwrap().git_reset(substr);
+			return String::from("Resetty");
 		}
 		
 		return String::from("Invalid command!");
