@@ -9,7 +9,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "esnext",
     "target": "es2020",
-    "types": ["react", "webpack"],
+    "types": ["react", "vite"],
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     // Other Outputs
     "sourceMap": true,

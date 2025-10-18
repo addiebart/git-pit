@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root, body {
     margin: 0;
@@ -11,5 +9,5 @@
     --cream: #F3E2D4;
     --orange: #FA812F;
     background: var(--black);
-    color: var(--cream)
+    color: var(--cream);
 }
