@@ -102,40 +102,118 @@ impl GitRunner{
 			_ => repo.reset(&target_commit, ResetType::Hard, None)?,
 		}
 		Ok(())
-	}	
-	
-	pub fn pull(&mut self) -> Result<(), Error> {
-		Ok(())
-			
 	}
 	
+	/* gay
+	pub fn pull(&mut self) -> Result<(), Error> {
+		let repo = Repository::open(".")?;
+
+		// set up remote (usually "origin")
+		let mut remote = repo.find_remote("origin")?;
+
+		// set up callbacks for authentication (for HTTPS or SSH)
+		let mut cb = RemoteCallbacks::new();
+		cb.credentials(|_url, username_from_url, _allowed_types| {
+			// This tries SSH first, falls back to default creds
+			Cred::ssh_key_from_agent(username_from_url.unwrap_or("git"))
+		});
+
+		// set up fetch options using callbacks
+		let mut fo = FetchOptions::new();
+		fo.remote_callbacks(cb);
+
+		// fetch updates from origin
+		println!("Fetching from origin...");
+		remote.fetch(&["main"], Some(&mut fo), None)?;
+		println!("Fetch complete!");
+
+		// figure out what branch we’re on
+		let head = repo.head()?.shorthand().unwrap().to_string();
+		let fetch_head = repo.find_reference("FETCH_HEAD")?;
+		let fetch_commit = repo.reference_to_annotated_commit(&fetch_head)?;
+
+		// merge the fetched branch into local
+		let analysis = repo.merge_analysis(&[&fetch_commit])?;
+		if analysis.0.is_fast_forward() {
+			println!("Fast-forwarding {}...", head);
+
+			let mut ref_head = repo.find_reference(&format!("refs/heads/{}", head))?;
+			ref_head.set_target(fetch_commit.id(), "Fast-Forward")?;
+			repo.set_head(&format!("refs/heads/{}", head))?;
+			repo.checkout_head(Some(
+				git2::build::CheckoutBuilder::default()
+					.force(), // overwrite working tree
+			))?;
+			println!("Fast-forward complete!");
+		} else {
+			println!("Non-fast-forward; you’d need a merge or rebase manually.");
+		}
+
+		Ok(())
+	}
+	*/
+
+	/* also gay ill deal with it later 
 	pub fn git_clone(&mut self, url: String) -> Result<(), Error> {
 		Ok(())
 			
 	}
+	*/
 	
 	pub fn git_checkout(&mut self, branch_name: String) -> Result<(), Error> {
-		Ok(())
-			
-	}
-	
-	pub fn git_branch(&mut self, branch_name: String) -> Result<(), Error> {
-		Ok(())
-		
-	}
+		let repo = Repository::open(".")?;
 
-	pub fn git_merge(&mut self, branch_name: String) -> Result<(), Error> {
+		// Find the local branch reference
+		let (object, reference_opt) = repo.revparse_ext(&format!("refs/heads/{}", branch_name.as_str()))?;
+
+		if let Some(reference) = reference_opt {
+			repo.set_head(reference.name().unwrap())?;
+		} else {
+			repo.set_head_detached(object.id())?;
+		}
+
+		// Update working tree to match new HEAD
+		repo.checkout_head(Some(
+			git2::build::CheckoutBuilder::default()
+				.force() // overwrite working tree files if needed
+		))?;
+
+		println!("Switched to branch '{}'", branch_name);
+		Ok(())
+	}
+	
+	//git branch <branch_name>
+	pub fn git_branch(&mut self, branch_name: String) -> Result<(), Error> {
+		let repo = Repository::open(".")?;
+		let head_commit = repo.head()?.peel_to_commit()?;
+		repo.branch(branch_name.as_str(), &head_commit, false)?;
+		println!("Created branch '{}'", branch_name);
 		Ok(())
 		
 	}
 	
-	//executes git -a branch
+	//executes git branch -a ... will do later
 	pub fn git_branch_namecheck(&mut self) -> Result<(), Error> {
 		Ok(())
 	}
 	
+	//git branch --show-current
 	pub fn git_branch_show_current(&mut self) -> Result<(), Error> {
+		let repo = Repository::open(".")?;
+		let head = repo.head()?;
+		if head.is_branch() {
+			if let Some(name) = head.shorthand() {
+				println!("Current branch: {}", name); //we'll need to return this eventually
+			}
+		} else {
+			println!("Detached HEAD");
+		}
 		Ok(())
+	}
+	
+	pub fn git_merge(&mut self, branch_name: String) -> Result<(), Error> {
+		Ok(())
+		
 	}
 	
 	pub fn git_log_follow(&mut self) -> Result<(), Error> {
@@ -171,26 +249,36 @@ impl Parser{
 		if input.contains("git config user.name"){
 			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
 			return String::from("Username successfully changed");
-		}
-		if input.contains("git config user.email"){
+		} else if input.contains("git config user.email"){
 			self.git_runner.as_mut().unwrap().git_config_email(input[11..input.len() - 1].to_string());
 			return String::from("Email successfully changed");
-		}
-		if input.contains("git add"){
+		} else if input.contains("git add"){
 			let substr = input[7..input.len()].to_string();
 			self.git_runner.as_mut().unwrap().git_add(substr);
 			return String::from("Add");
-		}
-		if input.contains("git commit -m"){
+		} else if input.contains("git commit -m"){
 			let substr = input[14..input.len() - 1].to_string();
 			self.git_runner.as_mut().unwrap().git_commit(substr);
 			return String::from("Commit");
-		}
-		
-		if input.contains("git reset"){
+		} else if input.contains("git reset"){
 			let substr = input[11..17].to_string();
 			self.git_runner.as_mut().unwrap().git_reset(substr);
 			return String::from("Resetty");
+		} else if input.contains("git checkout"){
+			let substr = input[14..input.len() - 1].to_string();
+			self.git_runner.as_mut().unwrap().git_checkout(substr);
+			return String::from("Checking out!");
+		} else if input.contains("git branch"){
+			if input.contains("-a"){
+				return String::from("Lillian Brooks-Kanost is too lazy to code this rn")
+			} else if input.contains("--show-current"){
+				self.git_runner.as_mut().unwrap().git_branch_show_current();
+				return String::from("show a current branch");
+			} else {
+				let substr = input[12..input.len() - 1].to_string();
+				self.git_runner.as_mut().unwrap().git_branch(substr);
+				return String::from("making a new branch");
+			}
 		}
 		
 		return String::from("Invalid command!");
