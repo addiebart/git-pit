@@ -60,6 +60,7 @@ async fn parse_http(stream: &mut TcpStream) -> std::io::Result<Request<()>>{
 	}
 	req.body(()).map_err(|e| Error::new(ErrorKind::NotFound, "Builder error when trying to make request!"))
 }
+/*
 async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) -> std::io::Result<()>{
 	let http_parser = parse_http(&mut stream).await?;
 	if let Some(key) = http_parser.headers().get("Sec-WebSocket-Key"){
@@ -102,7 +103,7 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 	}
 	Ok(())
 }
-/*
+*/
 async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
 	let mut parser = Parser::new();
 	match accept_async(stream).await{
@@ -136,5 +137,3 @@ async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
 	Err(e) => eprintln!("Failed WebSocket handshake with {addr}: {e:?}"),
 	}	
 }
-
-*/
