@@ -32,21 +32,23 @@ impl GitRunner{
 	}
 	
 	//git config username will change the users name 
-	pub fn git_config_username (&mut self, username: String ) -> Result<(), Error>{
+	pub fn git_config_username (&mut self, username: String ) -> String{
 		let repo = Repository::open(".")?;
 		let mut config = repo.config()?;
-		config.set_str("user.name", &username)?;
-		println!("Updated git username locally!");
-		Ok(())
+		match config.set_str("user.name", &username) {
+			Ok(_) => "Updated git username: 200".to_string(),
+			Err(e) => format!("Failed to set username: {}", e),
+		}
 	}
 	
 	//git config email will change the users email 
-	pub fn git_config_email (&mut self, email: String) -> Result<(), Error>{
+	pub fn git_config_email (&mut self, email: String) -> String{
 		let repo = Repository::open(".")?;
 		let mut config = repo.config()?;
-		config.set_str("user.email", &email)?;
-		println!("Updated git email locally!");
-		Ok(())
+		match config.set_str("user.email", &email) {
+			Ok(_) => "Updated git email: 200".to_string(),
+			Err(e) => format!("Failed to set user email: {}", e),
+		}
 	}
 	
 	//we adding
@@ -246,6 +248,21 @@ impl Parser{
 			},
 			_ => {},
 		}
+		
+		if input.starts_with("git config user.name") {
+            if let Some(name) = input.strip_prefix("git config user.name ") {
+                let msg = runner.git_config_username(name.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+		
+		if input.starts_with("git config user.email") {
+            if let Some(email) = input.strip_prefix("git config user.email ") {
+                let msg = runner.git_config_email(email.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+		/*
 		if input.contains("git config user.name"){
 			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
 			return String::from("Username successfully changed");
@@ -280,7 +297,7 @@ impl Parser{
 				return String::from("making a new branch");
 			}
 		}
-		
+		*/
 		return String::from("Invalid git command: 400");
 	}	
 	
