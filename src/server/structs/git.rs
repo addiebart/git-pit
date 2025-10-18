@@ -24,7 +24,7 @@ impl GitRunner{
 	}
 	
 	//git config username will change the users name 
-	pub fn git_config_username (String username) -> Result<GitRunner, Error>{
+	pub fn git_config_username (username: String ) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let mut config = repo.config()?;
 		config.set_str("user.name", username)?;
@@ -33,13 +33,38 @@ impl GitRunner{
 	}
 	
 	//git config email will change the users email 
-	pub fn git_config_email (String email) -> Result<GitRunner, Error>{
+	pub fn git_config_email (email: String) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let mut config = repo.config()?;
 		config.set_str("user.email", email)?;
 		println!("Updated git email locally!");
 		Ok(())
 	}
+	
+	pub fn git_add (filename: String) -> Result<_, Error>{
+		let repo = Repository::open(".")?;
+		let mut index = repo.index()?;
+		match index {
+			"." => {
+				let mut status_opts = StatusOptions::new();
+				let statuses = repo.statuses(Some(&mut status_opts))?;
+				for entry in statuses.iter() {
+					if let Some(path) = entry.path() {
+						index.add_path(std::path::Path::new(path))?;
+					}
+				}
+			}
+			_ => index.add_path(std::path::Path::new(filename))?;
+		}
+		index.write()?;
+		println!("add staged");
+		Ok(())
+	}
+	
+	pub fn git_commit(message: String) -> Result<_, Error>{
+		
+		
+	}	
 }
 
 //Git struct
