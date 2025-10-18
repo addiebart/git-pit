@@ -13,14 +13,16 @@ pub struct Parser{
 
 impl GitRunner{
 	//init will create a repo
-	pub fn init() -> Result<GitRunner, Error>{
+	pub fn init() -> String{
+		//making dir
 		let dir = std::path::Path::new("repo");
 		if let Err(e) = std::fs::create_dir_all(&dir){
-			eprintln!("failed to create directory {}", e);
+			return format!("failed to create dir: {}", e);
 		} 
+		//making repo
 		match Repository::init(&dir){
-			Ok(repo) => return Ok(Self{command_queue: Vec::new(), repo}),
-			Err(err) => return Err(err)
+			Ok(_) => "Repo initialized: 201".to_string(),
+			Err(err) => format!("git init failed: {}", err),
 		}	
 	}
 	//uninit deletes the repo directory (and therefore the repo) (ran on game end)
@@ -233,16 +235,14 @@ impl Parser{
 	pub fn parse(&mut self, input: String) -> String{
 		//make sure str starts with git
 		if !input.starts_with("git"){
-			return String::from("Invalid command- give me a git command, goddamnit!");
+			return String::from("Non-git command: 400");
 		}
 		
 		//seeing what thing you're calling
-		match input.as_str(){
+		match input.as_str() {
 			"git init" => {
-				if let Ok(runner) = GitRunner::init(){
-					self.git_runner = Some(runner);
-				}
-				return String::from("Git repo created!");
+				let msg = GitRunner::init(); // just returns String now
+				return msg;
 			},
 			_ => {},
 		}
@@ -281,7 +281,7 @@ impl Parser{
 			}
 		}
 		
-		return String::from("Invalid command!");
+		return String::from("Invalid git command: 400");
 	}	
 	
 }	
