@@ -9,6 +9,7 @@ export default function({ onSubmit }: { onSubmit: (value: string) => void }) {
         const inputEle = event.currentTarget.elements.item(0)! as HTMLInputElement;
         const text = inputEle.value.trim().split(/\s+/).join(" ");
         onSubmit(text);
+        inputEle.value = "";
     }
 
     return (
