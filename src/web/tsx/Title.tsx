@@ -2,6 +2,6 @@ import React from "react";
 
 export default function({textContent} : {textContent: string}) {
     return (
-        <h1 className="title text-7xl">{textContent}</h1>
+        <h1 className="title text-7xl font-[ubuntu]">{textContent}</h1>
     );
 }

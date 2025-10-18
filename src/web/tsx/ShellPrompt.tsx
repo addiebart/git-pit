@@ -15,10 +15,10 @@ export default function({ onSubmit }: { onSubmit: (value: string) => void }) {
         <div className="text-3xl p-4 border-[var(--lightpurple)] border-4 rounded-4xl">
             <div className="flex gap-2 font-semibold items-center">
                 <span id="hostname" className="text-[var(--terminalgreen)]">git@pit</span>
-                <span id="path" className="text-[var(--terminalgreen)]">~/repo</span>
                 <FontAwesomeIcon icon={faCodeBranch} className="text-[var(--orange)]"/>
-                <span id="dollarsign" className="font-bold italic pr-2">$</span>
-                <form onSubmit={submitHandler}>
+                <span id="branchname" className="text-[var(--orange)]">main</span>
+                <span id="dollarsign" className="font-bold italic pr-2 pl-1">$</span>
+                <form onSubmit={submitHandler} className="flex flex-1">
                     <input
                         type="text"
                         name="shellprompt"
