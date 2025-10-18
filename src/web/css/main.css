@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 
 :root, body {
     margin: 0;
@@ -8,6 +9,7 @@
     --lightpurple: #C5B0CD;
     --cream: #F3E2D4;
     --orange: #FA812F;
+    --terminalgreen: #33a71c;
     background: var(--black);
     color: var(--cream);
 }

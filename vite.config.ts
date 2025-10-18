@@ -11,7 +11,7 @@ export default defineConfig({
     outDir: '../../build/web',
     emptyOutDir: true,
     rollupOptions: {
-      input: path.resolve(__dirname, 'src/web/html/index.html'),
+      input: path.resolve(__dirname, 'src/web/index.html'),
     },
   },
   server: {
