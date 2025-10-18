@@ -2,17 +2,14 @@ import { useState } from "react";
 import ShellPrompt from "./ShellPrompt";
 import TaskInfo from "./TaskInfo";
 import StatusText from "./StatusText";
+import levels from "./data/levels";
+import type { Level } from "./data/levels";
 
-export default function() {
+export default function({lvlidx}:{lvlidx: number}) {
 
-    const taskDetailsContent = (
-    <>
-        Git Pit is an educational game that challenges the player to perform Git operations to complete tasks.
-        If you're not too familar with git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">git cheat sheet</a> is recommended.
-        The point is to learn!
-        Create a local Git repsoitory to begin!
-    </>
-    );
+    const level = (lvlidx < levels.length) ? levels[lvlidx]! : levels[levels.length]!;
+    const taskDetailsContent = level.details;
+    const title = level.title;
 
     const [statusText, setStatusText] = useState(" ");
     
@@ -34,7 +31,7 @@ export default function() {
     <>
         <div className="flex flex-col flex-1">
             <div className="filler flex-1"></div>
-            <TaskInfo taskDetailsContent={taskDetailsContent} title="Enter the Pit!"></TaskInfo>
+            <TaskInfo taskDetailsContent={taskDetailsContent} title={title}></TaskInfo>
             <div className="filler flex-1"></div>
         </div>
         <span className="ml-4"><StatusText>{statusText}</StatusText></span>

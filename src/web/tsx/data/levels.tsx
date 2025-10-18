@@ -4,68 +4,73 @@ export type Level = {
     number: number,
     title: string,
     details: JSX.Element
-    goal: string
+    successCaptureSequence: RegExp[]
 };
 
 export default [
     {
         number: 0,
         title: "Level 0",
-        details: (<></>),
-        goal: "INIT"
+        details: (<>
+        Git Pit is an educational game that challenges the player to perform Git operations to complete tasks.
+        If you're not too familar with git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">git cheat sheet</a> is recommended.
+        The point is to learn!
+        Create a local Git repsoitory to begin!
+        </>),
+        successCaptureSequence: [/Repo initialized/]
     },
     {
         number: 1,
         title: "Level 1",
         details: (<></>),
-        goal: "Complete the second task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 2,
         title: "Level 2",
         details: (<></>),
-        goal: "Complete the third task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 3,
         title: "Level 3",
         details: (<></>),
-        goal: "Complete the fourth task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 4,
         title: "Level 4",
         details: (<></>),
-        goal: "Complete the fifth task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 5,
         title: "Level 5",
         details: (<></>),
-        goal: "Complete the sixth task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 6,
         title: "Level 6",
         details: (<></>),
-        goal: "Complete the seventh task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 7,
         title: "Level 7",
         details: (<></>),
-        goal: "Complete the eighth task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 8,
         title: "Level 8",
         details: (<></>),
-        goal: "Complete the ninth task"
+        successCaptureSequence: [/.*?/],
     },
     {
         number: 9,
         title: "Level 9",
         details: (<></>),
-        goal: "Complete the tenth task"
+        successCaptureSequence: [/.*?/],
     }
 ] as Level[];
