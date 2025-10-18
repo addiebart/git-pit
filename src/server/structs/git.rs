@@ -41,6 +41,7 @@ impl GitRunner{
 		Ok(())
 	}
 	
+	//we adding
 	pub fn git_add (filename: String) -> Result<_, Error>{
 		let repo = Repository::open(".")?;
 		let mut index = repo.index()?;
@@ -61,6 +62,7 @@ impl GitRunner{
 		Ok(())
 	}
 	
+	//we commiting
 	pub fn git_commit(message: String) -> Result<_, Error>{
 		
 		
