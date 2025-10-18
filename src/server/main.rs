@@ -8,7 +8,7 @@ use smol::prelude::*;
 fn main() -> std::io::Result<()> {
     smol::block_on(async {
         let listener = TcpListener::bind("127.0.0.1:0").await?;
-        println!("my beautifyl websocket server is server running on {}", listener.get_address());
+        println!("my beautifyl websocket server is server running on {:?}", listener.local_addr());
 
         loop {
             let (stream, addr) = listener.accept().await?;
@@ -25,7 +25,7 @@ async fn handle_connection(stream: async_net::TcpStream, addr: std::net::SocketA
 		Ok(mut websocket) => {
 				println!("websocketconnectionestablished with {addr}");
 				//listens for messages
-				while let Some(msg) = websocket.next().await{
+				while let Some(msg) = futures::StreamExt::next(&mut websocket).await{
 					match msg {
 						Ok(Message::Text(text)) => {
 							println!("Recieved from {addr}: {text}"); 
@@ -33,7 +33,7 @@ async fn handle_connection(stream: async_net::TcpStream, addr: std::net::SocketA
 							//call gitrunner
 							//gitrunner should execute given git function, then return Success or Failure
 							//Success/Failure should then be sent over to the JS/HTML
-							if websocket.send(Message::Text(format!("Echo: {text}"))).await.is_err() {
+							if websocket.send(Message::Text(format!("Echo: {text}").into())).await.is_err() {
 								println!("Failed to send message to {addr}");
 								break;
 							}
@@ -49,7 +49,8 @@ async fn handle_connection(stream: async_net::TcpStream, addr: std::net::SocketA
 						_ => {}	
 					}	
 				}
-			Err(e) => eprintln!("Failed WebSocket handshake with {addr}: {e:?}"),
+			}
+		Err(e) => eprintln!("Failed WebSocket handshake with {addr}: {e:?}"),
 		}	
 	}
-}
+
