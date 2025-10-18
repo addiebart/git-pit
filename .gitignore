@@ -1,0 +1,7 @@
+build
+exclude
+dist
+
+.DS_Store
+node_modules
+*.exclude

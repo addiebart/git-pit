@@ -1,0 +1,36 @@
+{
+  "name": "git-pit",
+  "version": "0.5.0",
+  "description": "A Git-based puzzle game for HackKState 2025",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/addiebart/git-pit.git"
+  },
+  "keywords": [
+    "game",
+    "web",
+    "web",
+    "game",
+    "git",
+    "educational"
+  ],
+  "author": "Addison Bartelli, Eyassu Mongalo, Lillian Brooks-Kanost",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/addiebart/git-pit/issues"
+  },
+  "homepage": "https://github.com/addiebart/git-pit#readme",
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.4",
+    "react": "^19.2.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.1"
+  }
+}
