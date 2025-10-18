@@ -1,5 +1,5 @@
 //git.rs (Facilitating git calls to backend using smol)
-use git2::{Repository, Error, ResetType};
+use git2::{Repository, Error, ResetType, StatusOptions};
 
 pub struct GitRunner{
 	command_queue: Vec<String>,
@@ -93,7 +93,7 @@ impl GitRunner{
 		Ok(())
 	}	
 	
-	//implement a fake "git push": TODO
+	//implement git pull, git pull from origin
 	
 	//resets last commit
 	pub fn git_reset(&mut self, compiler_flag: String) -> Result<(), Error>{
@@ -158,20 +158,18 @@ impl Parser{
 				}
 				return String::from("Git repo created!");
 			}
-			_ => {return String::from("Fart. bucket...")}
+			_ => {return String::from("Repo creation unsuccessful")}
 		}
 		if input.contains("git config user.name"){
 			self.git_runner.unwrap().git_config_username(input[11..input.len() - 2].to_string());
-			return String::from("yay");
+			return String::from("Username successfully changed");
 		}
 		if input.contains("git config user.email"){
 			self.git_runner.unwrap().git_config_email(input[11..input.len() - 2].to_string());
-			return String::from("yay");
+			return String::from("Email successfully changed");
 		}
 		
 		return String::from("Invalid command!");
 	}	
 	
 }	
-//Git struct
-//creating
