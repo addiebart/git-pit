@@ -25,6 +25,19 @@ module.exports = {
         }
     ],
     },
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'build/web'),
+        },
+        hot: true,
+        watchFiles: ['src/**/*'],
+        host: '0.0.0.0',
+        port: 8080,
+    },
+    watchOptions: {
+        poll: 1000, // Check for changes every second
+        ignored: /node_modules/,
+    },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'git-pit',

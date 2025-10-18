@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root, body {
+    margin: 0;
+    --black: #2D2727;
+    --slate: #413543;
+    --brightpurple: #8F43EE;
+    --lightpurple: #C5B0CD;
+    --cream: #F3E2D4;
+    --orange: #FA812F;
+    background: var(--black);
+    color: var(--cream)
+}

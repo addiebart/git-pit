@@ -8,8 +8,9 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "esnext",
-    "target": "esnext",
+    "target": "es2020",
     "types": ["react", "webpack"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
@@ -29,12 +30,18 @@
 
     // Recommended Options
     "strict": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
-  }
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "noEmit": true
+  },
+  "include": ["src/web"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
