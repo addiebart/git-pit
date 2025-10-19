@@ -35,7 +35,7 @@ impl GitRunner{
 	
 	//git config username will change the users name 
 	pub fn git_config_username (&mut self, username: String ) -> String{
-		let repo = Repository::open(".");
+		let repo = Repository::open("repo");
 		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
 		match config.set_str("user.name", &username) {
 			Ok(_) => "Updated git username: 200".to_string(),
@@ -45,14 +45,14 @@ impl GitRunner{
 	
 	//git config email will change the users email 
 	pub fn git_config_email (&mut self, email: String) -> String{
-		let repo = Repository::open(".");
+		let repo = Repository::open("repo");
 		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
 		match config.set_str("user.email", &email) {
 			Ok(_) => "Updated git email: 200".to_string(),
 			Err(e) => format!("Failed to set user email: {}", e),
 		}
 	}
-	
+	/*
 	//we adding
 	pub fn git_add (&mut self, filename: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
@@ -229,6 +229,7 @@ impl GitRunner{
 	pub fn git_stash(&mut self) -> Result<(), Error> {
 		Ok(())
 	}
+		*/
 }
 
 impl Parser{
