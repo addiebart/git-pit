@@ -36,7 +36,7 @@ impl GitRunner{
 	//git config username will change the users name 
 	pub fn git_config_username (username: String ) -> String{
 		let repo = Repository::open("repo");
-		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
+		let mut config: git2::Config = repo.expect("fatal error").config().expect("...");
 		match config.set_str("user.name", &username) {
 			Ok(_) => "Updated git username: 200".to_string(),
 			Err(e) => format!("Failed to set username: {}", e),
@@ -46,7 +46,7 @@ impl GitRunner{
 	//git config email will change the users email 
 	pub fn git_config_email (email: String) -> String{
 		let repo = Repository::open("repo");
-		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
+		let mut config: git2::Config = repo.expect("fatal error").config().expect("fatal error");
 		match config.set_str("user.email", &email) {
 			Ok(_) => "Updated git email: 200".to_string(),
 			Err(e) => format!("Failed to set user email: {}", e),
@@ -56,59 +56,58 @@ impl GitRunner{
 	//we adding
 	pub fn git_add (filename: String) -> String{
 		let mut repo = Repository::open("repo");
-		let mut index = repo.as_mut().expect("Great expectations").index();
+		let mut index = repo.as_mut().expect("fatal error").index();
 		match filename.as_str() {
 			"." => {
 				let mut status_opts = StatusOptions::new();
-				let statuses = repo.as_mut().expect("Great expectations").statuses(Some(&mut status_opts)).expect("poop");
+				let statuses = repo.as_mut().expect("fatal error").statuses(Some(&mut status_opts)).expect("poop");
 				for entry in statuses.iter() {
 					if let Some(path) = entry.path() {
-						match &mut index.as_mut().expect("Great expectations").add_path(std::path::Path::new(path)) {
-							Ok(_) => println!("'add' succeeded: 200"),
+						match &mut index.as_mut().expect("fatal error").add_path(std::path::Path::new(path)) {
+							Ok(_) => println!("'add' succeeded: 200, path: {}", path),
 							Err(e) => return format!("Failed to add: {}", e),
 						}
 					}
 				}
 			},
 			_ => { 
-				match index.as_mut().expect("Great expectations").add_path(std::path::Path::new(&filename)){
-					Ok(_) => println!("'add' succeeded: 200"),
+				match index.as_mut().expect("fatal error").add_path(std::path::Path::new(&filename)){
+					Ok(_) => println!("'add' succeeded: 200, path: {}", path),
 					Err(e) => return format!("Failed to add: {}", e),
 					
 				}
 			}
 		}
-		match index.expect("Great expectations").write(){
+		match index.expect("fatal error").write(){
 			Ok(_) => "File write succeeded: 200".to_string(),
 			Err(e) => format!("File write failed: {}", e),
 		}	
 	}
-	/*
+	
 	//we commiting
-	pub fn git_commit(&mut self, message: String) -> Result<(), Error>{
-		let repo = Repository::open(".")?;
-		let sig = repo.signature()?; 
-		let mut index = repo.index()?;
-		let tree_id = index.write_tree()?;
-		let tree = repo.find_tree(tree_id)?;
-
+	pub fn git_commit(message: String) -> String{
+		let mut repo = Repository::open("repo");
+		let sig = repo.as_ref().expect("fatal error").signature(); 
+		let mut index = repo.as_ref().expect("fatal error").index();
+		let tree_id = index.expect("fatal error").write_tree().expect("fatal error");
+		let tree = repo.as_ref().expect("fatal error").find_tree(tree_id);
 		//attaches previous commit to this one
-		let parent_commit = repo.head()?.peel_to_commit()?;
-
+		let parent_commit = repo.as_ref().expect("fatal error").head().expect("fatal error").peel_to_commit();
 		// Make the commit!
-		repo.commit(
+		match repo.as_ref().expect("fatal error").commit(
 			Some("HEAD"),   // update HEAD
-			&sig,           // author
-			&sig,           // committer
+			sig.as_ref().expect("fatal error"),           // author
+			sig.as_ref().expect("fatal error"),           // committer
 			&message,        // message
-			&tree,          // new tree object
-			&[&parent_commit], // parent commit(s)
-		)?;
-
-		Ok(())
+			&tree.expect("fatal error"),          // new tree object
+			&[&parent_commit.expect("fatal error")], // parent commit(s)
+		) {
+			Ok(_) => "Commit succeeded: 200".to_string(),
+			Err(e) => format!("Failed to add: {}", e),	
+		}
 	}	
 	
-	
+	/*
 	//resets last commit
 	pub fn git_reset(&mut self, compiler_flag: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
@@ -231,10 +230,10 @@ impl GitRunner{
 	//git branch --show-current
 	pub fn git_branch_show_current() -> String{
 		let repo = Repository::open("repo");
-		let binding = repo.expect("Homosexuality");
+		let binding = repo.expect("fatal error");
 		let mut head = binding.head();
-		if head.as_mut().expect("Homosexuality").is_branch() {
-			if let Some(name) = head.expect("Homosexuality").shorthand() {
+		if head.as_mut().expect("fatal error").is_branch() {
+			if let Some(name) = head.expect("fatal error").shorthand() {
 				return format!("Current branch {}: 200", name); //we'll need to return this eventually
 			} else {return ("Detached HEAD: 400").to_string();}
 		} else { return ("Detached HEAD: 400").to_string();}
@@ -276,7 +275,7 @@ impl Parser{
 			},
 			_ => {},
 		}
-		
+		//yandere dev ahh code...
 		if input.starts_with("git config user.name") {
             if let Some(name) = input.strip_prefix("git config user.name ") {
                 let msg = GitRunner::git_config_username(name.trim_matches('"').to_string());
@@ -305,47 +304,17 @@ impl Parser{
 		
 		if input.starts_with("git add") {
             if let Some(file_name) = input.strip_prefix("git add ") {
-                let msg = GitRunner::git_add(file_name);
+                let msg = GitRunner::git_add(file_name.to_string());
                 return msg;
             }
         }
 		
-		/*
-		if input.contains("git config user.name"){
-			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
-			return String::from("Username successfully changed");
-		} else if input.contains("git config user.email"){
-			self.git_runner.as_mut().unwrap().git_config_email(input[11..input.len() - 1].to_string());
-			return String::from("Email successfully changed");
-		} else if input.contains("git add"){
-			let substr = input[7..input.len()].to_string();
-			self.git_runner.as_mut().unwrap().git_add(substr);
-			return String::from("Add");
-		} else if input.contains("git commit -m"){
-			let substr = input[14..input.len() - 1].to_string();
-			self.git_runner.as_mut().unwrap().git_commit(substr);
-			return String::from("Commit");
-		} else if input.contains("git reset"){
-			let substr = input[11..17].to_string();
-			self.git_runner.as_mut().unwrap().git_reset(substr);
-			return String::from("Resetty");
-		} else if input.contains("git checkout"){
-			let substr = input[14..input.len() - 1].to_string();
-			self.git_runner.as_mut().unwrap().git_checkout(substr);
-			return String::from("Checking out!");
-		} else if input.contains("git branch"){
-			if input.contains("-a"){
-				return String::from("Lillian Brooks-Kanost is too lazy to code this rn")
-			} else if input.contains("--show-current"){
-				self.git_runner.as_mut().unwrap().git_branch_show_current();
-				return String::from("show a current branch");
-			} else {
-				let substr = input[12..input.len() - 1].to_string();
-				self.git_runner.as_mut().unwrap().git_branch(substr);
-				return String::from("making a new branch");
-			}
+		if input.starts_with("git commit -m") {
+			if let Some(message) = input.strip_prefix("git commit -m ") {
+                let msg = GitRunner::git_commit(message.trim_matches('"').to_string());
+                return msg;
+            }
 		}
-		*/
 		return String::from("Invalid git command: 400");
 	}	
 	
