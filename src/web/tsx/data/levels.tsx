@@ -35,7 +35,7 @@ export default [
         title: "Enable Tracking",
         details: (<>
         This is important for us to proceded. I need to track you............r files.
-        There's a file called "addme.txt" in the directory you're currently in &lpar;and can't leave&rpar;.
+        There's a file called "addme.txt" in the directory you're currently in (and can't leave).
         I need you track that file down. Some also call this staging, adding, or snapshotting. 
         </>),
         successCaptureSequence: [/File write succeeded.*addme.txt/],
