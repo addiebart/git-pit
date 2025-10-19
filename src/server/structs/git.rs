@@ -72,8 +72,8 @@ impl GitRunner{
 								match index.add_path(std::path::Path::new(&filename)){
 									Ok(path) => println!("'add' succeeded: 200, path: {:?}", path),
 									Err(e) => return format!("Failed to add: {}", e),
-									
 								}
+								println!("hey!");
 							}
 						}
 						match index.write(){
@@ -82,10 +82,11 @@ impl GitRunner{
 						}
 					},
 						
-					Err(e) => return format!("Failed to get index file: {}", e)
+					Err(e) => format!("Failed to get index file: {}", e)
 				}	
-			}
-			Err(e) => return format!("Failed to open repo: {}", e)
+			},
+			
+			Err(e) => format!("Failed to open repo: {}", e)
 		}
 	}
 	
