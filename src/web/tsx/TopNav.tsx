@@ -1,6 +1,10 @@
 import React from "react";
 
 export default function() {
+    function aboutOnClick() {
+
+    }
+
     return (
         <nav role="navigation" aria-label="Main" className="mx-[5%] px-[5%] mb-16 font-semibold text-lg border-b-1 border-x-1 rounded-b-2xl">
            <div className="flex items-center py-2">
@@ -9,16 +13,12 @@ export default function() {
                 </span>
 
                 <ul className="flex gap-[8px] ml-auto">
+                    {/*
                     <li>
-                        <button type="button" className="px-2 py-1 rounded-md hover:bg-[var(--slate)] transition-colors text-[var(--cream)] cursor-pointer">
-                            Levels
+                        <button type="button" className="px-2 py-1 rounded-md hover:bg-[var(--slate)] transition-colors text-[var(--cream)] cursor-pointer" onClick={aboutOnClick}>
                         </button>
                     </li>
-                    <li>
-                        <button type="button" className="px-2 py-1 rounded-md hover:bg-[var(--slate)] transition-colors text-[var(--cream)] cursor-pointer">
-                            About
-                        </button>
-                    </li>
+                    */}
                     <li>
                         <button type="button" className="px-2 py-1 rounded-md hover:bg-[var(--slate)] transition-colors text-[var(--cream)] cursor-pointer">
                             <a href="https://github.com/addiebart/git-pit">Source</a>
