@@ -257,10 +257,22 @@ impl GitRunner{
 			Ok(r) => r,
 			Err(e) => return format!("Failed to open repo: {}", e),
 		};
-		let mut check_builder = CheckoutBuilder::default();
-		match repo.checkout_head(Some(&mut check_builder)){
-			Ok(k) => "hey!".to_string(),
-			Err(e) => format!("Failed to checkout head: {}", e)
+		let (object, reference) = match repo.revparse_ext(&branch_name) {
+			Ok((o, r)) => (o, r),
+			Err(e) => return format!("Failed to find branch: {}", e),
+		};
+		if let Err(e) = repo.checkout_tree(&object, None) {
+			return format!("Failed to checkout: {}", e);
+		};
+		let res = match reference {
+			// gref is an actual reference like branches or tags
+			Some(gref) => repo.set_head(gref.name().unwrap()),
+			// this is a commit, not a reference
+			None => repo.set_head_detached(object.id()),
+		};
+		match res {
+			Ok(_) => return "checkout complete!".to_string(),
+			Err(e) => return format!("Failed to set head: {}", e)
 		}
 	}
 	pub fn git_branch(branch_name: String) -> String{
@@ -354,8 +366,19 @@ impl Parser{
             return msg;
         }
 
-		if input.starts_with("git branch -m ") {
-            if let Some(branch_name) = input.strip_prefix("git branch -m ") {
+		if input.starts_with("git checkout -b ") {
+            if let Some(branch_name) = input.strip_prefix("git checkout -b ") {
+                let msg = GitRunner::git_branch( branch_name.trim_matches('"').to_string());
+                if !msg.contains("Created") {
+					return msg;
+				}
+				let msg = GitRunner::git_checkout(branch_name.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+
+		if input.starts_with("git checkout ") {
+            if let Some(branch_name) = input.strip_prefix("git checkout ") {
                 let msg = GitRunner::git_checkout(branch_name.trim_matches('"').to_string());
                 return msg;
             }
