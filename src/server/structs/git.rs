@@ -83,32 +83,31 @@ impl GitRunner{
 			Err(e) => format!("File write failed: {}", e),
 		}	
 	}
-	/*
+	
 	//we commiting
-	pub fn git_commit(&mut self, message: String) -> Result<(), Error>{
-		let repo = Repository::open(".")?;
-		let sig = repo.signature()?; 
-		let mut index = repo.index()?;
-		let tree_id = index.write_tree()?;
-		let tree = repo.find_tree(tree_id)?;
-
+	pub fn git_commit(message: String) -> String{
+		let mut repo = Repository::open("repo");
+		let sig = repo.as_ref().expect("expect").signature(); 
+		let mut index = repo.as_ref().expect("expect").index();
+		let tree_id = index.expect("expect").write_tree().expect("I'm tired of this");
+		let tree = repo.as_ref().expect("expect").find_tree(tree_id);
 		//attaches previous commit to this one
-		let parent_commit = repo.head()?.peel_to_commit()?;
-
+		let parent_commit = repo.as_ref().expect("expect").head().expect("expect").peel_to_commit();
 		// Make the commit!
-		repo.commit(
+		match repo.as_ref().expect("expect").commit(
 			Some("HEAD"),   // update HEAD
-			&sig,           // author
-			&sig,           // committer
+			sig.as_ref().expect("PLEASE"),           // author
+			sig.as_ref().expect("PLEASE"),           // committer
 			&message,        // message
-			&tree,          // new tree object
-			&[&parent_commit], // parent commit(s)
-		)?;
-
-		Ok(())
+			&tree.expect("PLEASE"),          // new tree object
+			&[&parent_commit.expect("expect...")], // parent commit(s)
+		) {
+			Ok(_) => "Commit succeeded: 200".to_string(),
+			Err(e) => format!("Failed to add: {}", e),	
+		}
 	}	
 	
-	
+	/*
 	//resets last commit
 	pub fn git_reset(&mut self, compiler_flag: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
@@ -305,22 +304,18 @@ impl Parser{
 		
 		if input.starts_with("git add") {
             if let Some(file_name) = input.strip_prefix("git add ") {
-                let msg = GitRunner::git_add(file_name);
+                let msg = GitRunner::git_add(file_name.to_string());
                 return msg;
             }
         }
 		
+		if input.starts_with("git commit -m") {
+			if let Some(message) = input.strip_prefix("git commit -m ") {
+                let msg = GitRunner::git_commit(message.trim_matches('"').to_string());
+                return msg;
+            }
+		}
 		/*
-		if input.contains("git config user.name"){
-			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
-			return String::from("Username successfully changed");
-		} else if input.contains("git config user.email"){
-			self.git_runner.as_mut().unwrap().git_config_email(input[11..input.len() - 1].to_string());
-			return String::from("Email successfully changed");
-		} else if input.contains("git add"){
-			let substr = input[7..input.len()].to_string();
-			self.git_runner.as_mut().unwrap().git_add(substr);
-			return String::from("Add");
 		} else if input.contains("git commit -m"){
 			let substr = input[14..input.len() - 1].to_string();
 			self.git_runner.as_mut().unwrap().git_commit(substr);
@@ -336,13 +331,6 @@ impl Parser{
 		} else if input.contains("git branch"){
 			if input.contains("-a"){
 				return String::from("Lillian Brooks-Kanost is too lazy to code this rn")
-			} else if input.contains("--show-current"){
-				self.git_runner.as_mut().unwrap().git_branch_show_current();
-				return String::from("show a current branch");
-			} else {
-				let substr = input[12..input.len() - 1].to_string();
-				self.git_runner.as_mut().unwrap().git_branch(substr);
-				return String::from("making a new branch");
 			}
 		}
 		*/
