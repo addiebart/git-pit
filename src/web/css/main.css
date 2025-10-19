@@ -12,6 +12,7 @@
     --cream: #F3E2D4;
     --orange: #FA812F;
     --terminalgreen: #33a71c;
+    --red: #c5152a;
     background: var(--black);
     color: var(--cream);
 }
