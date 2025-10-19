@@ -33,8 +33,8 @@ impl GitRunner{
 	
 	//git config username will change the users name 
 	pub fn git_config_username (&mut self, username: String ) -> String{
-		let repo = Repository::open(".")?;
-		let mut config = repo.config()?;
+		let repo = Repository::open("repo");
+		let mut config = repo.expect("Always returns String").config().expect("Always returns String");
 		match config.set_str("user.name", &username) {
 			Ok(_) => "Updated git username: 200".to_string(),
 			Err(e) => format!("Failed to set username: {}", e),
@@ -43,15 +43,15 @@ impl GitRunner{
 	
 	//git config email will change the users email 
 	pub fn git_config_email (&mut self, email: String) -> String{
-		let repo = Repository::open(".")?;
-		let mut config = repo.config()?;
+		let repo = Repository::open("repo");
+		let mut config = repo.expect("Always returns String").config().expect("Always returns String");
 		match config.set_str("user.email", &email) {
 			Ok(_) => "Updated git email: 200".to_string(),
 			Err(e) => format!("Failed to set user email: {}", e),
 		}
 	}
 	
-	//we adding
+	/*
 	pub fn git_add (&mut self, filename: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
 		let mut index = repo.index()?;
@@ -227,6 +227,7 @@ impl GitRunner{
 	pub fn git_stash(&mut self) -> Result<(), Error> {
 		Ok(())
 	}
+	*/
 }
 
 impl Parser{
@@ -251,14 +252,14 @@ impl Parser{
 		
 		if input.starts_with("git config user.name") {
             if let Some(name) = input.strip_prefix("git config user.name ") {
-                let msg = runner.git_config_username(name.trim_matches('"').to_string());
+                let msg = self.git_runner.as_mut().unwrap().git_config_username(name.trim_matches('"').to_string());
                 return msg;
             }
         }
 		
 		if input.starts_with("git config user.email") {
             if let Some(email) = input.strip_prefix("git config user.email ") {
-                let msg = runner.git_config_email(email.trim_matches('"').to_string());
+                let msg = self.git_runner.as_mut().unwrap().git_config_email(email.trim_matches('"').to_string());
                 return msg;
             }
         }
