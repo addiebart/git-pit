@@ -22,6 +22,7 @@ export default function LevelPage() {
         const messageContent = event.data as string;
         console.log(`WS: Message got: ${messageContent}`);
 
+        let trimmedMessage = messageContent.replace(/(:\s*[0-9]+\s*)/, ""); // Remove status code for user.
         setStatusColor("");
         if (messageContent.includes("400")) {
             setStatusColor("text-[var(--red)]");
@@ -29,8 +30,14 @@ export default function LevelPage() {
         else if (messageContent.includes("200") || messageContent.includes("201")) {
             setStatusColor("text-[var(--terminalgreen)]");
         }
-
-        const trimmedMessage = messageContent.replace(/(:\s*[0-9]+\s*)/, ""); // Remove status code for user.
+        else if (messageContent.includes("Failed to add: could not find")) {
+            setStatusColor("text-[var(--red)]");
+            trimmedMessage = trimmedMessage.replace(/('.*\/)/, "").replace(/('.*)/, "");
+        }
+        else if (messageContent.includes("Failed to open repo:")) {
+            setStatusColor("text-[var(--red)]");
+            trimmedMessage = "The repository has not yet been initalized"
+        }
         setStatusText(trimmedMessage);
 
         if (regexes.length < 1) {
