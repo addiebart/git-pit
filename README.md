@@ -12,7 +12,7 @@ Our team had never developed a full-stack application before and as such, most o
 We think that there are plenty of things to be proud with this project. We finished on time, it's well polished, the frontend looks nice, we were able to write the backend in Rust, and most importantly, we covered and lot of new ground and learned along the way.
 ## What we learned
 We learned a lot building our first full-stack app. Firstly, we used and learned about a lot of new technologies in this project including Vite, Tailwind, WebSocket, and Smol for Async Rust. Somewhat less tangibly, we learned about the importance of coodination for a larger scale project, quickly realizing we benefited greatly knowing what each other were working on and when changes would be seen upstream.
-## What's next for Space World 2000
+## What's next for Git Pit
 The next steps would be to add more advanced challenges for users to complete. Currently, the challenges are all one command each and don't make use of remotes. To more realistically educate users on Git, this would be a priority.
 ## Install Instructions
 - Ensure rustup is installed on your system. It can be installed from here: http://rustup.rs/
