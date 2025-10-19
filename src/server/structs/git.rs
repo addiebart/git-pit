@@ -271,7 +271,8 @@ impl GitRunner{
 			None => repo.set_head_detached(object.id()),
 		};
 		match res {
-			Ok(_) => return "checkout complete!".to_string(),
+			// Ok(_) => return "checkout complete!".to_string(),
+			Ok(_) => format!("Checkout successful: 200: branch name: {}", branch_name),
 			Err(e) => return format!("Failed to set head: {}", e)
 		}
 	}
@@ -366,7 +367,8 @@ impl Parser{
             return msg;
         }
 
-		if input.starts_with("git checkout -b ") {
+		if input.starts_with("git checkout -b ") { // disable to prevent softlock on branch level
+			/*
             if let Some(branch_name) = input.strip_prefix("git checkout -b ") {
                 let msg = GitRunner::git_branch( branch_name.trim_matches('"').to_string());
                 if !msg.contains("Created") {
@@ -375,9 +377,10 @@ impl Parser{
 				let msg = GitRunner::git_checkout(branch_name.trim_matches('"').to_string());
                 return msg;
             }
+			*/
         }
 
-		if input.starts_with("git checkout ") {
+		else if input.starts_with("git checkout ") {
             if let Some(branch_name) = input.strip_prefix("git checkout ") {
                 let msg = GitRunner::git_checkout(branch_name.trim_matches('"').to_string());
                 return msg;

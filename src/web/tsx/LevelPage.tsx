@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import ShellPrompt from "./ShellPrompt";
 import TaskInfo from "./TaskInfo";
 import StatusText from "./StatusText";
 import levels from "./data/levels";
+import EndPage from "./EndPage";
 
 export default function LevelPage() {
     const [lvlidx, setLevel] = useState(0);
     const [statusText, setStatusText] = useState(" ");
     const [statusColor, setStatusColor] = useState("");
+    const [isGameComplete, setGameComplete] = useState(false);
+    const [branchName, setBranchName] = useState("master");
+
+    if (isGameComplete) {
+        return <EndPage />;
+    }
 
     // Recalculate level and its properties on each render
     const level = (lvlidx < levels.length) ? levels[lvlidx]! : levels[levels.length - 1]!;
@@ -24,6 +31,9 @@ export default function LevelPage() {
 
         let trimmedMessage = messageContent.replace(/(:\s*[0-9]+)/, ""); // Remove status code for user.
         setStatusColor("");
+        if (trimmedMessage === "Invalid git command") {
+            trimmedMessage = "Invalid or unsupported git command";
+        }
         if (messageContent.includes("400")) {
             setStatusColor("text-[var(--red)]");
         }
@@ -34,9 +44,19 @@ export default function LevelPage() {
             setStatusColor("text-[var(--red)]");
             trimmedMessage = trimmedMessage.replace(/('.*\/)/, "").replace(/('.*)/, "");
         }
-        else if (messageContent.includes("Failed to open repo:")) {
+        else if (messageContent.includes("Failed to find branch:")) {
             setStatusColor("text-[var(--red)]");
-            trimmedMessage = "The repository has not yet been initalized"
+            trimmedMessage = "The provided branch does not exist";
+        }
+        else if (messageContent.includes("failed to resolve path 'repo'") || messageContent.includes("Failed to open repo:")) {
+            setStatusColor("text-[var(--red)]");
+            trimmedMessage = "A repository has not yet been created";
+        }
+        if (messageContent.includes("Checkout successful:")) {
+            const matches = messageContent.match(/branch name: (.*)/);
+            if (matches) {
+                setBranchName(matches[0]);
+            }
         }
         setStatusText(trimmedMessage);
 
@@ -57,8 +77,12 @@ export default function LevelPage() {
     function levelComplete() {
         const audio = new Audio("/mp3/ding.mp3");
         audio.play();
-        if (lvlidx < levels.length - 1) { // if there is another level to play]
+        if (lvlidx < levels.length - 1) { // if there is another level to play
+            console.log(lvlidx, levels.length);
             setLevel(lvlidx + 1);
+        }
+        else {
+            setGameComplete(true);
         }
     }
 
@@ -73,7 +97,7 @@ export default function LevelPage() {
                 <StatusText>{statusText}</StatusText>
             </span></span>
             <div className="spacer my-1"></div>
-            <ShellPrompt onSubmit={(value: string) => socket.send(value)}/>
+            <ShellPrompt branch={branchName} onSubmit={(value: string) => socket.send(value)}/>
             <div className="bottomMargin mb-16"></div>
         </>
     );

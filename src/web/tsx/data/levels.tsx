@@ -13,7 +13,7 @@ export default [
         title: "Enter The Git Pit!!",
         details: (<>
         Git Pit is an educational game that challenges the player to perform Git operations to complete tasks.
-        If you're not too familar with git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">git cheat sheet</a> is recommended.
+        If you're not too familar with Git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">Git cheat sheet</a> is recommended.
         The point is to learn!
         Create a local Git repsoitory to begin!
         </>),
@@ -34,7 +34,7 @@ export default [
         number: 2,
         title: "Enable Tracking",
         details: (<>
-        This is important for us to proceded. I need to track you............r files.
+        This is important for us to proceed. I need to track you............r files.
         There's a file called "addme.txt" in the directory you're currently in (and can't leave).
         I need you track that file down. Some also call this staging, adding, or snapshotting. 
         </>),
@@ -46,7 +46,7 @@ export default [
         details: (<>
         In Git, A "commit" is a "permanent" snapshot in the version history of a repository.
         These snapshots are the basis of Git, the idea being that you can return or build upon them at any time.
-        I need you to commit your saved snapshot with a custom note.
+        I need you to make a commit from the file you added with a custom note.
         </>),
         successCaptureSequence: [/Commit succeeded/],
     },
@@ -56,22 +56,23 @@ export default [
         details: (<>
         Branches are like parallel timelines for your repository. 
         At any point, you can split off from the current state of your repository to work an alternate timeline.
-        This in helpful you want to have a quick and easy way to revert your changes,
-        or if you're working in a group and multiple people want to work at the same time without steping on each other's toes.
+        This is helpful if you want to have a quick and easy way to revert your changes
+        or if you're working in a group wheres multiple people want to work at the same time without steping on each other's toes.
         Create a new branch called "branchtwo" <span className="font-semibold italic">without switching to it.</span>
         </>),
         successCaptureSequence: [/Created branch 'branchtwo'/],
     },
     {
         number: 5,
-        title: "Thanks for Your Purchase.",
+        title: "At the Grocery Store.",
         details: (<>
-        The checkout command allows you to switch to another active branch. 
+        The checkout command allows you to change your active branch to another in your repository. 
         You can also use "git checkout -b &lt;branchname&gt;" to create a branch and switch to it in one step.
         Switch your active branch to the one you created in the previous task.
         </>),
-        successCaptureSequence: [/.*?/],
+        successCaptureSequence: [/Checkout successful.*branchtwo/],
     },
+    /*
     {
         number: 6,
         title: "Level 6",
@@ -96,4 +97,5 @@ export default [
         details: (<></>),
         successCaptureSequence: [/.*?/],
     }
+    */
 ] as Level[];

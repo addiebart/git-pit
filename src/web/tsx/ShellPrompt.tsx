@@ -2,7 +2,7 @@ import React from "react";
 import { faCodeBranch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function({ onSubmit }: { onSubmit: (value: string) => void }) {
+export default function({ onSubmit, branch }: { onSubmit: (value: string) => void, branch: string }) {
 
     const submitHandler: React.FormEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
@@ -13,12 +13,12 @@ export default function({ onSubmit }: { onSubmit: (value: string) => void }) {
     }
 
     return (
-        <div className="text-3xl p-4 border-[var(--lightpurple)] border-4 rounded-4xl">
-            <div className="flex gap-2 font-semibold items-center">
-                <span id="hostname" className="text-[var(--terminalgreen)]">git@pit</span>
+        <div className="text-3xl p-3 border-[var(--lightpurple)] border-4 rounded-4xl">
+            <div className="flex gap-2 font-semibold items-center leading-1">
+                <span id="hostname" className="text-[var(--terminalgreen)] ml-2">git@pit</span>
                 <FontAwesomeIcon icon={faCodeBranch} className="text-[var(--orange)]"/>
-                <span id="branchname" className="text-[var(--orange)]">main</span>
-                <span id="dollarsign" className="font-bold italic pr-2 pl-1">$</span>
+                <span id="branchname" className="text-[var(--orange)]">{branch}</span>
+                <span id="dollarsign" className="font-bold pr-2 pl-1">$</span>
                 <form onSubmit={submitHandler} className="flex flex-1">
                     <input
                         type="text"
