@@ -52,38 +52,38 @@ impl GitRunner{
 			Err(e) => format!("Failed to set user email: {}", e),
 		}
 	}
-	/*
+
 	//we adding
 	pub fn git_add (filename: String) -> String{
-		let repo = Repository::open("repo");
-		let mut index = repo.index();
+		let mut repo = Repository::open("repo");
+		let mut index = repo.as_mut().expect("Great expectations").index();
 		match filename.as_str() {
 			"." => {
 				let mut status_opts = StatusOptions::new();
-				let statuses = repo.statuses(Some(&mut status_opts));
+				let statuses = repo.as_mut().expect("Great expectations").statuses(Some(&mut status_opts)).expect("poop");
 				for entry in statuses.iter() {
 					if let Some(path) = entry.path() {
-						match index.add_path(std::path::Path::new(path)) {
-							Ok(_) => "'add .' succeeded: 200".to_string(),
-							Err(e) => format!("Failed to add: {}", e),
+						match &mut index.as_mut().expect("Great expectations").add_path(std::path::Path::new(path)) {
+							Ok(_) => println!("'add' succeeded: 200"),
+							Err(e) => return format!("Failed to add: {}", e),
 						}
 					}
 				}
 			},
 			_ => { 
-				match index.add_path(std::path::Path::new(&filename)){
-					Ok(_) => "'add' succeeded: 200".to_string(),
-					Err(e) => format!("Failed to add: {}", e),
+				match index.as_mut().expect("Great expectations").add_path(std::path::Path::new(&filename)){
+					Ok(_) => println!("'add' succeeded: 200"),
+					Err(e) => return format!("Failed to add: {}", e),
 					
 				}
 			}
 		}
-		match index.write(){
+		match index.expect("Great expectations").write(){
 			Ok(_) => "File write succeeded: 200".to_string(),
 			Err(e) => format!("File write failed: {}", e),
 		}	
 	}
-
+	/*
 	//we commiting
 	pub fn git_commit(&mut self, message: String) -> Result<(), Error>{
 		let repo = Repository::open(".")?;
@@ -201,13 +201,24 @@ impl GitRunner{
 	*/
 	//git branch <branch_name>
 	pub fn git_branch(branch_name: String) -> String{
-		let mut repo = Repository::open("repo");
-		let binding = repo.as_mut().expect("Homosexuality");
-		let head = binding.head().expect("failed to get HEAD");
-		let head_commit = head.peel_to_commit().expect("failed to peel to commit");
-		match binding.branch(branch_name.as_str(), &head_commit, false) {
+		let repo = match Repository::open("repo") {
+			Ok(r) => r,
+			Err(e) => return format!("Failed to open repo: {}", e),
+		};
+
+		// Try to get HEAD; handle case where repo is empty
+		let head_commit = match repo.head()
+			.ok()
+			.and_then(|h| h.peel_to_commit().ok()) {
+			Some(c) => c,
+			None => {
+				return "Cannot create branch: no commits exist yet (empty repo): 400".to_string();
+			}
+		};
+
+		match repo.branch(&branch_name, &head_commit, false) {
 			Ok(_) => format!("Created branch '{}': 200", branch_name),
-			Err(e) => format!("Failed to create branch: 400"),
+			Err(e) => format!("Failed to create branch: {}", e),
 		}
 		
 	}
@@ -288,6 +299,13 @@ impl Parser{
 		if input.starts_with("git branch ") {
             if let Some(branch_name) = input.strip_prefix("git branch ") {
                 let msg = GitRunner::git_branch(branch_name.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+		
+		if input.starts_with("git add") {
+            if let Some(file_name) = input.strip_prefix("git add ") {
+                let msg = GitRunner::git_add(file_name);
                 return msg;
             }
         }
