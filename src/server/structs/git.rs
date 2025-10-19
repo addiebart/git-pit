@@ -15,10 +15,20 @@ impl GitRunner{
 			return format!("failed to create dir: {}", e);
 		} 
 		//making repo
+		let file_loc = std::path::Path::new("repo/addme.txt");
+		if file_loc.exists(){
+			return "addme already initialized: Err".to_string()
+		}else{
+			match std::fs::write("repo/addme.txt", "Rust vs Typescript, a story that predates time, one must imagine a union of the two unhappy...."){
+				Ok(_) => {},
+				Err(err) => return format!("Addme Init failed: {}", err),
+			}
+		}
 		match Repository::init(&dir){
 			Ok(repo) => "Repo initialized: 201".to_string(),
 			Err(err) => format!("git init failed: {}", err),
 		}
+
 	}
 	//uninit deletes the repo directory (and therefore the repo) (ran on game end)
 	pub fn uninit() -> std::io::Result<()>{
@@ -71,7 +81,7 @@ impl GitRunner{
 							}
 						}
 					},
-				Err(e) => return format!("Failed to obtain status information: {}", e),
+					Err(e) => return format!("Failed to obtain status information: {}", e),
 				};
 			},
 			_ => { 
