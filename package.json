@@ -1,5 +1,5 @@
 {
-  "name": "git-pit",
+  "name": "git-smart",
   "version": "0.5.0",
   "description": "A Git-based puzzle game for HackKState 2025",
   "main": "main.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/addiebart/git-pit.git"
+    "url": "git+https://github.com/addiebart/git-smart.git"
   },
   "keywords": [
     "game",
@@ -22,9 +22,9 @@
   "author": "Addison Bartelli, Eyassu Mongalo, Lillian Brooks-Kanost",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/addiebart/git-pit/issues"
+    "url": "https://github.com/addiebart/git-smart/issues"
   },
-  "homepage": "https://github.com/addiebart/git-pit#readme",
+  "homepage": "https://github.com/addiebart/git-smart#readme",
   "devDependencies": {
     "@types/node": "^24.8.1",
     "@types/react": "^19.2.2",

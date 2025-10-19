@@ -15,7 +15,7 @@ export default function({ onSubmit, branch }: { onSubmit: (value: string) => voi
     return (
         <div className="text-3xl p-3 border-[var(--lightpurple)] border-4 rounded-4xl">
             <div className="flex gap-2 font-semibold items-center leading-1">
-                <span id="hostname" className="text-[var(--terminalgreen)] ml-2">git@pit</span>
+                <span id="hostname" className="text-[var(--terminalgreen)] ml-2">git@smart</span>
                 <FontAwesomeIcon icon={faCodeBranch} className="text-[var(--orange)]"/>
                 <span id="branchname" className="text-[var(--orange)]">{branch}</span>
                 <span id="dollarsign" className="font-bold pr-2 pl-1">$</span>

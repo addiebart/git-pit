@@ -10,9 +10,9 @@ export type Level = {
 export default [
     {
         number: 0,
-        title: "Enter The Git Pit!!",
+        title: "Time to Git Smart",
         details: (<>
-        Git Pit is an educational game that challenges the player to perform Git operations to complete tasks.
+        Git Smart is an educational game that challenges the player to perform Git operations to complete tasks.
         If you're not too familar with Git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">Git cheat sheet</a> is recommended.
         The point is to learn!
         Create a local Git repsoitory to begin!

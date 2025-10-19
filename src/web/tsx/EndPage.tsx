@@ -3,7 +3,7 @@ import TaskInfo from "./TaskInfo";
 export default function EndPage() {
     const title = "Thanks for Playing!";
     const taskDetailsContent = (<>
-        That marks the end of the Git Pit. Due to limited time,
+        That marks the end of Git Smart. Due to limited time,
         we weren't able to implement levels involving remotes or
         more complex levels with series of commands
         (ex: stash, checkout, commit, push, checkout back, pop stash) as we originally intended.
