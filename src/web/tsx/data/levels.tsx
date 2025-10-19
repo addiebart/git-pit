@@ -10,7 +10,7 @@ export type Level = {
 export default [
     {
         number: 0,
-        title: "Level 0",
+        title: "Enter The Git Pit!!",
         details: (<>
         Git Pit is an educational game that challenges the player to perform Git operations to complete tasks.
         If you're not too familar with git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">git cheat sheet</a> is recommended.
