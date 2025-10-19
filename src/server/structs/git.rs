@@ -13,17 +13,19 @@ pub struct Parser{
 
 impl GitRunner{
 	//init will create a repo
-	pub fn init() -> String{
+	pub fn init() -> (String, Self){
 		//making dir
 		let dir = std::path::Path::new("repo");
+
 		if let Err(e) = std::fs::create_dir_all(&dir){
-			return format!("failed to create dir: {}", e);
+			//return format!("failed to create dir: {}", e);
 		} 
 		//making repo
 		match Repository::init(&dir){
-			Ok(_) => "Repo initialized: 201".to_string(),
-			Err(err) => format!("git init failed: {}", err),
-		}	
+			Ok(repo) => ("Repo initialized: 201".to_string(), Self{command_queue: Vec::new(), repo: repo}),
+			//Err(err) => format!("git init failed: {}", err),
+			_ => {panic!("no.")}
+		}
 	}
 	//uninit deletes the repo directory (and therefore the repo) (ran on game end)
 	pub fn uninit() -> std::io::Result<()>{
@@ -32,21 +34,23 @@ impl GitRunner{
 	}
 	
 	//git config username will change the users name 
-	pub fn git_config_username (&mut self, username: String ) -> Result<(), Error>{
-		let repo = Repository::open(".")?;
-		let mut config = repo.config()?;
-		config.set_str("user.name", &username)?;
-		println!("Updated git username locally!");
-		Ok(())
+	pub fn git_config_username (&mut self, username: String ) -> String{
+		let repo = Repository::open(".");
+		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
+		match config.set_str("user.name", &username) {
+			Ok(_) => "Updated git username: 200".to_string(),
+			Err(e) => format!("Failed to set username: {}", e),
+		}
 	}
 	
 	//git config email will change the users email 
-	pub fn git_config_email (&mut self, email: String) -> Result<(), Error>{
-		let repo = Repository::open(".")?;
-		let mut config = repo.config()?;
-		config.set_str("user.email", &email)?;
-		println!("Updated git email locally!");
-		Ok(())
+	pub fn git_config_email (&mut self, email: String) -> String{
+		let repo = Repository::open(".");
+		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
+		match config.set_str("user.email", &email) {
+			Ok(_) => "Updated git email: 200".to_string(),
+			Err(e) => format!("Failed to set user email: {}", e),
+		}
 	}
 	
 	//we adding
@@ -241,11 +245,27 @@ impl Parser{
 		//seeing what thing you're calling
 		match input.as_str() {
 			"git init" => {
-				let msg = GitRunner::init(); // just returns String now
+				let (msg, new) = GitRunner::init(); // just returns String now
+				self.git_runner = Some(new);
 				return msg;
 			},
 			_ => {},
 		}
+		
+		if input.starts_with("git config user.name") {
+            if let Some(name) = input.strip_prefix("git config user.name ") {
+                let msg = self.git_runner.as_mut().unwrap().git_config_username(name.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+		
+		if input.starts_with("git config user.email") {
+            if let Some(email) = input.strip_prefix("git config user.email ") {
+                let msg = self.git_runner.as_mut().unwrap().git_config_email(email.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+		/*
 		if input.contains("git config user.name"){
 			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
 			return String::from("Username successfully changed");
@@ -280,7 +300,7 @@ impl Parser{
 				return String::from("making a new branch");
 			}
 		}
-		
+		*/
 		return String::from("Invalid git command: 400");
 	}	
 	

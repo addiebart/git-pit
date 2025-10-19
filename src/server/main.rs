@@ -1,5 +1,6 @@
 use git2::Repository;
-use smol::{io::{AsyncReadExt, Error, ErrorKind}, io::AsyncWriteExt, net::{TcpListener, TcpStream}};
+use smol::{io::{AsyncReadExt, Error, ErrorKind}, io::AsyncWriteExt, net::{TcpListener, TcpStream}, spawn, Timer};
+use std::time::Duration;
 use async_tungstenite::accept_async;            
 use async_tungstenite::tungstenite::protocol::Message;  
 use smol::prelude::*;
@@ -69,6 +70,7 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 				let ctx = WebSocketContext::new(sec_key);
 				let (sign, ws) = ctx.on_upgrade(
 					move |mut conn: Connection<TcpStream>| async move {
+						println!("test");
 						let mut parser = Parser::new();
 						while let Ok(Some(msg)) = conn.recv().await {
 							match msg {
@@ -92,9 +94,12 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 								}
 								_ => {}
 							}
+							Timer::after(Duration::from_secs(1));
 						}
+						println!("what");
 					}
 				);
+				spawn(ws.manage(stream)).detach();
 			}
 			Err(e) => eprintln!("Sec-WebSocket-Key string error!! handshake failed at {addr}: {e:?}"),
 		}
