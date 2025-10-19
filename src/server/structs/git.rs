@@ -1,5 +1,5 @@
 //git.rs (Facilitating git calls to backend using smol)
-use git2::{Repository, Error, ResetType, StatusOptions};
+use git2::{Repository, Error, ResetType, StatusOptions, BranchType::{Local, Remote}, build::CheckoutBuilder};
 
 pub struct GitRunner;
 
@@ -47,67 +47,92 @@ impl GitRunner{
 
 	//we adding
 	pub fn git_add (filename: String) -> String{
-		match Repository::open("repo"){
-			Ok(repo) => {
-					match repo.index(){
-					Ok(mut index) => {
-						match filename.as_str() {
-							"." => {
-								let mut status_opts = StatusOptions::new();
-								match repo.statuses(Some(&mut status_opts)){
-									Ok(statuses) => {
-										for entry in statuses.iter() {
-											if let Some(path) = entry.path() {
-												match &mut index.add_path(std::path::Path::new(path)) {
-													Ok(_) => println!("'add' succeeded: 200, path: {:?}", path),
-													Err(e) => return format!("Failed to add: {}", e),
-												}
-											}
-										}
-									},
-									Err(e) => return format!("Failed to obtain status information: {}", e),
-								};
-							},
-							_ => { 
-								match index.add_path(std::path::Path::new(&filename)){
-									Ok(path) => println!("'add' succeeded: 200, path: {:?}", path),
+		let repo = match Repository::open("repo") {
+			Ok(r) => r,
+			Err(e) => return format!("Failed to add: {}", e)
+		};
+
+		let mut index = match repo.index(){
+			Ok(i) => i,
+			Err(e) => return format!("Failed to index file: {}", e),
+		};
+
+		match filename.as_str() {
+			"." => {
+				let mut status_opts = StatusOptions::new();
+				match repo.statuses(Some(&mut status_opts)){
+					Ok(statuses) => {
+						for entry in statuses.iter() {
+							if let Some(path) = entry.path() {
+								match &mut index.add_path(std::path::Path::new(path)) {
+									Ok(_) => println!("'add' succeeded: 200, path: {:?}", path),
 									Err(e) => return format!("Failed to add: {}", e),
 								}
-								println!("hey!");
 							}
 						}
-						match index.write(){
-							Ok(path) => "File write succeeded: 200".to_string(),
-							Err(e) => format!("File write failed: {}", e),
-						}
 					},
-						
-					Err(e) => format!("Failed to get index file: {}", e)
-				}	
+				Err(e) => return format!("Failed to obtain status information: {}", e),
+				};
 			},
-			
-			Err(e) => format!("Failed to open repo: {}", e)
+			_ => { 
+				match index.add_path(std::path::Path::new(&filename)){
+					Ok(_) => println!("'add' succeeded: 200, path: {:?}", filename),
+					Err(e) => return format!("Failed to add: {}", e),
+				}
+				println!("hey!");
+			}
+		}
+		match index.write(){
+			Ok(path) => format!("File write succeeded: 200 path: {}", filename),
+			Err(e) => format!("File write failed: {}", e),
 		}
 	}
 	
 	//we commiting
 	pub fn git_commit(message: String) -> String{
-		let mut repo = Repository::open("repo");
-		let sig = repo.as_ref().expect("fatal error").signature(); 
-		let mut index = repo.as_ref().expect("fatal error").index();
-		let tree_id = index.expect("fatal error").write_tree().expect("fatal error");
-		let tree = repo.as_ref().expect("fatal error").find_tree(tree_id);
-		//attaches previous commit to this one
-		let parent_commit = repo.as_ref().expect("fatal error").head().expect("fatal error").peel_to_commit();
-		// Make the commit!
-		match repo.as_ref().expect("fatal error").commit(
-			Some("HEAD"),   // update HEAD
-			sig.as_ref().expect("fatal error"),           // author
-			sig.as_ref().expect("fatal error"),           // committer
-			&message,        // message
-			&tree.expect("fatal error"),          // new tree object
-			&[&parent_commit.expect("fatal error")], // parent commit(s)
-		) {
+		let repo = match Repository::open("repo") {
+			Ok(r) => r,
+			Err(e) => return format!("Failed to add: {}", e)
+		};
+
+		let mut index = match repo.index(){
+			Ok(i) => i,
+			Err(e) => return format!("Failed to index file: {}", e),
+		};
+
+		let sig = match repo.signature(){
+			Ok(s) => s,
+			Err(e) => return format!("Failed to get signature: {}", e),
+		};
+
+		let tree_id = match index.write_tree(){
+			Ok(t) => t,
+			Err(e) => return format!("Failed to write index as tree: {}", e),
+		};
+
+		let tree = match repo.find_tree(tree_id){
+			Ok(t) => t,
+			Err(e) => return format!("Failed to find tree: {}", e),
+		};
+
+		let parent_commit = match repo.head(){
+			Ok(peel) => {
+				match peel.peel_to_commit(){
+					Ok(p) => p,
+					Err(e) => return format!("Failed to turn peel to commit: {}", e),
+				}
+			}
+			Err(e) => return format!("Failed to find head: {}", e),
+		};
+
+		match repo.commit(
+			Some("HEAD"), //update HEAD
+			&sig, //author
+			&sig, //commiter
+			&message, //message
+			&tree,
+			&[&parent_commit]
+			) {
 			Ok(_) => "Commit succeeded: 200".to_string(),
 			Err(e) => format!("Failed to add: {}", e),	
 		}
@@ -205,6 +230,17 @@ impl GitRunner{
 	}
 	*/
 	//git branch <branch_name>
+	pub fn git_checkout(branch_name: String) -> String {
+		let repo = match Repository::open("repo") {
+			Ok(r) => r,
+			Err(e) => return format!("Failed to open repo: {}", e),
+		};
+		let mut check_builder = CheckoutBuilder::default();
+		match repo.checkout_head(Some(&mut check_builder)){
+			Ok(k) => "hey!".to_string(),
+			Err(e) => format!("Failes to checkout head: {}", e)
+		}
+	}
 	pub fn git_branch(branch_name: String) -> String{
 		let repo = match Repository::open("repo") {
 			Ok(r) => r,
@@ -294,6 +330,13 @@ impl Parser{
 		if input.starts_with("git branch --show-current") {
             let msg = GitRunner::git_branch_show_current();
             return msg;
+        }
+
+		if input.starts_with("git branch -m ") {
+            if let Some(branch_name) = input.strip_prefix("git branch ") {
+                let msg = GitRunner::git_checkout(branch_name.trim_matches('"').to_string());
+                return msg;
+            }
         }
 		
 		if input.starts_with("git branch ") {
