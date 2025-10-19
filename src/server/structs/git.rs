@@ -54,24 +54,34 @@ impl GitRunner{
 	}
 	/*
 	//we adding
-	pub fn git_add (&mut self, filename: String) -> Result<(), Error>{
-		let repo = Repository::open(".")?;
-		let mut index = repo.index()?;
+	pub fn git_add (filename: String) -> String{
+		let repo = Repository::open("repo");
+		let mut index = repo.index();
 		match filename.as_str() {
 			"." => {
 				let mut status_opts = StatusOptions::new();
-				let statuses = repo.statuses(Some(&mut status_opts))?;
+				let statuses = repo.statuses(Some(&mut status_opts));
 				for entry in statuses.iter() {
 					if let Some(path) = entry.path() {
-						index.add_path(std::path::Path::new(path))?;
+						match index.add_path(std::path::Path::new(path)) {
+							Ok(_) => "'add .' succeeded: 200".to_string(),
+							Err(e) => format!("Failed to add: {}", e),
+						}
 					}
 				}
 			},
-			_ => index.add_path(std::path::Path::new(&filename))?,
+			_ => { 
+				match index.add_path(std::path::Path::new(&filename)){
+					Ok(_) => "'add' succeeded: 200".to_string(),
+					Err(e) => format!("Failed to add: {}", e),
+					
+				}
+			}
 		}
-		index.write()?;
-		println!("add staged");
-		Ok(())
+		match index.write(){
+			Ok(_) => "File write succeeded: 200".to_string(),
+			Err(e) => format!("File write failed: {}", e),
+		}	
 	}
 
 	//we commiting
@@ -166,6 +176,7 @@ impl GitRunner{
 	}
 	*/
 	
+	
 	pub fn git_checkout(&mut self, branch_name: String) -> Result<(), Error> {
 		let repo = Repository::open(".")?;
 
@@ -187,36 +198,37 @@ impl GitRunner{
 		println!("Switched to branch '{}'", branch_name);
 		Ok(())
 	}
-	
+	*/
 	//git branch <branch_name>
-	pub fn git_branch(&mut self, branch_name: String) -> Result<(), Error> {
-		let repo = Repository::open(".")?;
-		let head_commit = repo.head()?.peel_to_commit()?;
-		repo.branch(branch_name.as_str(), &head_commit, false)?;
-		println!("Created branch '{}'", branch_name);
-		Ok(())
+	pub fn git_branch(branch_name: String) -> String{
+		let mut repo = Repository::open("repo");
+		let binding = repo.as_mut().expect("Homosexuality");
+		let head = binding.head().expect("failed to get HEAD");
+		let head_commit = head.peel_to_commit().expect("failed to peel to commit");
+		match binding.branch(branch_name.as_str(), &head_commit, false) {
+			Ok(_) => format!("Created branch '{}': 200", branch_name),
+			Err(e) => format!("Failed to create branch: 400"),
+		}
 		
 	}
-	
+	/*
 	//executes git branch -a ... will do later
 	pub fn git_branch_namecheck(&mut self) -> Result<(), Error> {
 		Ok(())
 	}
-	
+	*/
 	//git branch --show-current
-	pub fn git_branch_show_current(&mut self) -> Result<(), Error> {
-		let repo = Repository::open(".")?;
-		let head = repo.head()?;
-		if head.is_branch() {
-			if let Some(name) = head.shorthand() {
-				println!("Current branch: {}", name); //we'll need to return this eventually
-			}
-		} else {
-			println!("Detached HEAD");
-		}
-		Ok(())
+	pub fn git_branch_show_current() -> String{
+		let repo = Repository::open("repo");
+		let binding = repo.expect("Homosexuality");
+		let mut head = binding.head();
+		if head.as_mut().expect("Homosexuality").is_branch() {
+			if let Some(name) = head.expect("Homosexuality").shorthand() {
+				return format!("Current branch {}: 200", name); //we'll need to return this eventually
+			} else {return ("Detached HEAD: 400").to_string();}
+		} else { return ("Detached HEAD: 400").to_string();}
 	}
-	
+	/*
 	pub fn git_merge(&mut self, branch_name: String) -> Result<(), Error> {
 		Ok(())
 		
@@ -229,7 +241,7 @@ impl GitRunner{
 	pub fn git_stash(&mut self) -> Result<(), Error> {
 		Ok(())
 	}
-		*/
+	*/
 }
 
 impl Parser{
@@ -267,6 +279,19 @@ impl Parser{
                 return msg;
             }
         }
+		
+		if input.starts_with("git branch --show-current") {
+            let msg = GitRunner::git_branch_show_current();
+            return msg;
+        }
+		
+		if input.starts_with("git branch ") {
+            if let Some(branch_name) = input.strip_prefix("git branch ") {
+                let msg = GitRunner::git_branch(branch_name.trim_matches('"').to_string());
+                return msg;
+            }
+        }
+		
 		/*
 		if input.contains("git config user.name"){
 			self.git_runner.as_mut().unwrap().git_config_username(input[11..input.len() - 1].to_string());
