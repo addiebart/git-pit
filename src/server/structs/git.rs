@@ -64,7 +64,7 @@ impl GitRunner{
 				for entry in statuses.iter() {
 					if let Some(path) = entry.path() {
 						match &mut index.as_mut().expect("fatal error").add_path(std::path::Path::new(path)) {
-							Ok(_) => println!("'add' succeeded: 200, path: {}", path),
+							Ok(_) => println!("'add' succeeded: 200, path: {:?}", path),
 							Err(e) => return format!("Failed to add: {}", e),
 						}
 					}
@@ -72,14 +72,14 @@ impl GitRunner{
 			},
 			_ => { 
 				match index.as_mut().expect("fatal error").add_path(std::path::Path::new(&filename)){
-					Ok(_) => println!("'add' succeeded: 200, path: {}", path),
+					Ok(path) => println!("'add' succeeded: 200, path: {:?}", path),
 					Err(e) => return format!("Failed to add: {}", e),
 					
 				}
 			}
 		}
 		match index.expect("fatal error").write(){
-			Ok(_) => "File write succeeded: 200".to_string(),
+			Ok(path) => "File write succeeded: 200".to_string(),
 			Err(e) => format!("File write failed: {}", e),
 		}	
 	}
