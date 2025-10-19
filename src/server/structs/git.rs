@@ -132,7 +132,19 @@ impl GitRunner{
 					Err(e) => return format!("Failed to turn peel to commit: {}", e),
 				}
 			}
-			Err(e) => return format!("Failed to find head: {}", e),
+			Err(e) => {
+				match repo.commit(
+					Some("HEAD"), //update HEAD
+					&sig, //author
+					&sig, //commiter
+					&message, //message
+					&tree,
+					&[]
+					) {
+					Ok(_) => return "Commit succeeded: 200".to_string(),
+					Err(e) => return format!("Failed to add: {}", e),	
+				}
+			}
 		};
 
 		match repo.commit(
@@ -248,7 +260,7 @@ impl GitRunner{
 		let mut check_builder = CheckoutBuilder::default();
 		match repo.checkout_head(Some(&mut check_builder)){
 			Ok(k) => "hey!".to_string(),
-			Err(e) => format!("Failes to checkout head: {}", e)
+			Err(e) => format!("Failed to checkout head: {}", e)
 		}
 	}
 	pub fn git_branch(branch_name: String) -> String{
@@ -343,7 +355,7 @@ impl Parser{
         }
 
 		if input.starts_with("git branch -m ") {
-            if let Some(branch_name) = input.strip_prefix("git branch ") {
+            if let Some(branch_name) = input.strip_prefix("git branch -m ") {
                 let msg = GitRunner::git_checkout(branch_name.trim_matches('"').to_string());
                 return msg;
             }
