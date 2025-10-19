@@ -10,7 +10,7 @@ export type Level = {
 export default [
     {
         number: 0,
-        title: "Time to Git Smart",
+        title: "Time to Git Smart.",
         details: (<>
         Git Smart is an educational game that challenges the player to perform Git operations to complete tasks.
         If you're not too familar with Git, looking at a <a href="https://education.github.com/git-cheat-sheet-education.pdf" className="underline">Git cheat sheet</a> is recommended.
