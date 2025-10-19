@@ -21,7 +21,7 @@ export default function() {
                     */}
                     <li>
                         <button type="button" className="px-2 py-1 rounded-md hover:bg-[var(--slate)] transition-colors text-[var(--cream)] cursor-pointer">
-                            <a href="https://github.com/addiebart/git-pit">Source</a>
+                            <a href="https://github.com/addiebart/git-pit" target="_blank">Source</a>
                         </button>
                     </li>
                 </ul>

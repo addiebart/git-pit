@@ -22,7 +22,7 @@ export default function LevelPage() {
         const messageContent = event.data as string;
         console.log(`WS: Message got: ${messageContent}`);
 
-        let trimmedMessage = messageContent.replace(/(:\s*[0-9]+\s*)/, ""); // Remove status code for user.
+        let trimmedMessage = messageContent.replace(/(:\s*[0-9]+)/, ""); // Remove status code for user.
         setStatusColor("");
         if (messageContent.includes("400")) {
             setStatusColor("text-[var(--red)]");
