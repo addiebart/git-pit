@@ -32,7 +32,7 @@ export default [
     },
     {
         number: 2,
-        title: "Enable Tracking",
+        title: "Enable Tracking.",
         details: (<>
         This is important for us to proceed. I need to track you............r files.
         There's a file called "addme.txt" in the directory you're currently in (and can't leave).
