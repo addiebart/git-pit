@@ -1,13 +1,11 @@
 use git2::Repository;
 use smol::{io::{AsyncReadExt, Error, ErrorKind}, io::AsyncWriteExt, net::{TcpListener, TcpStream}, spawn, Timer};
 use std::time::Duration;
-use async_tungstenite::accept_async;            
-use async_tungstenite::tungstenite::protocol::Message;  
 use smol::prelude::*;
 mod structs;
 use structs::git::{Parser, GitRunner};
-use http::{HeaderMap, Request, HeaderName, HeaderValue, request::Builder, Version, Method};
-use mews::{WebSocketContext, WebSocket, Connection};
+use http::{HeaderMap, Request, HeaderName, HeaderValue, request::Builder, Version, Method, StatusCode, Response};
+use mews::{WebSocketContext, WebSocket, Connection, Message};
 
 fn main() -> std::io::Result<()> {
     smol::block_on(async {
@@ -61,7 +59,7 @@ async fn parse_http(stream: &mut TcpStream) -> std::io::Result<Request<()>>{
 	}
 	req.body(()).map_err(|e| Error::new(ErrorKind::NotFound, "Builder error when trying to make request!"))
 }
-/*
+
 async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) -> std::io::Result<()>{
 	let http_parser = parse_http(&mut stream).await?;
 	if let Some(key) = http_parser.headers().get("Sec-WebSocket-Key"){
@@ -74,21 +72,21 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 						let mut parser = Parser::new();
 						while let Ok(Some(msg)) = conn.recv().await {
 							match msg {
-								mews::Message::Text(text) => {
+								Message::Text(text) => {
 									println!("Recieved text from {addr}: {text}");
 									//this is where you'd call worker function, then send back to addr
 									//call gitrunner
 									let message: String = parser.parse(text.to_string());
 									//Success/Failure should then be sent over to the JS/HTML
-									if conn.send(mews::Message::Text(format!("{message}").into())).await.is_err() {
+									if conn.send(Message::Text(format!("{message}").into())).await.is_err() {
 										println!("Failed to send message to {addr}");
 										break;
 									}
 								}
-								mews::Message::Binary(bin) => {
+								Message::Binary(bin) => {
 									println!("Recieved binary from {addr}: {bin:?}");
 								}
-								mews::Message::Close(close) => {
+								Message::Close(close) => {
 									println!("Client {addr} disconnected");
 									break;
 								}
@@ -99,6 +97,24 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 						println!("what");
 					}
 				);
+				/* this would be cute to use if possible
+				let response = Response::builder()
+					.status(StatusCode::SWITCHING_PROTOCOLS)
+					.header("Upgrade", "websocket")
+					.header("Connection", "Upgrade")
+					.header("Sec-WebSocket-Accept", &sign)
+					.body(())
+					.unwrap();
+				*/
+				let mut resp_str = format!(
+					"HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: {}\r\n\r\n",
+					sign
+				);
+
+				// You could use `http::Response`'s parts, but manual formatting is simpler here.
+				if let Err(e) = stream.write_all(resp_str.as_bytes()).await {
+					eprintln!("write error: {e}");
+				}
 				spawn(ws.manage(stream)).detach();
 			}
 			Err(e) => eprintln!("Sec-WebSocket-Key string error!! handshake failed at {addr}: {e:?}"),
@@ -107,38 +123,4 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 		eprintln!("Sec-WebSocket-Key not found! handshake failed at {addr}");
 	}
 	Ok(())
-}
-*/
-async fn handle_connection(stream: TcpStream, addr: std::net::SocketAddr){
-	let mut parser = Parser::new();
-	match accept_async(stream).await{
-		Ok(mut websocket) => {
-				println!("websocketconnectionestablished with {addr}");
-				//listens for messages
-				while let Some(msg) = smol::stream::StreamExt::next(&mut websocket).await{
-					match msg {
-						Ok(Message::Text(text)) => {
-                            println!("Recieved from {addr}: {text}"); 
-                            //this is where you'd call worker function, then send back to addr
-                            //call gitrunner
-                            let message: String = parser.parse(text.to_string());
-                            //Success/Failure should then be sent over to the JS/HTML
-                            if websocket.send(Message::Text(format!("{message}").into())).await.is_err() {
-                                println!("Failed to send message to {addr}");
-                                break;
-                            }
-                        }
-						Ok(Message::Binary(bin)) => {
-							println!("Binary data from {addr}: {bin:?}");
-						}
-						Ok(Message::Close(_)) | Err(_) => {
-							println!("Client {addr} disconnected");
-							break;
-						}
-						_ => {}	
-					}	
-				}
-		}
-	Err(e) => eprintln!("Failed WebSocket handshake with {addr}: {e:?}"),
-	}	
 }
