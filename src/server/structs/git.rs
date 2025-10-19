@@ -34,7 +34,7 @@ impl GitRunner{
 	}
 	
 	//git config username will change the users name 
-	pub fn git_config_username (&mut self, username: String ) -> String{
+	pub fn git_config_username (username: String ) -> String{
 		let repo = Repository::open("repo");
 		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
 		match config.set_str("user.name", &username) {
@@ -44,7 +44,7 @@ impl GitRunner{
 	}
 	
 	//git config email will change the users email 
-	pub fn git_config_email (&mut self, email: String) -> String{
+	pub fn git_config_email (email: String) -> String{
 		let repo = Repository::open("repo");
 		let mut config: git2::Config = repo.expect("Please... GITCONFIGUSER").config().expect("...");
 		match config.set_str("user.email", &email) {
@@ -234,6 +234,7 @@ impl GitRunner{
 
 impl Parser{
 	pub fn new()-> Self{
+		
 		Self{git_runner: None}
 	}
 	
@@ -255,14 +256,14 @@ impl Parser{
 		
 		if input.starts_with("git config user.name") {
             if let Some(name) = input.strip_prefix("git config user.name ") {
-                let msg = self.git_runner.as_mut().unwrap().git_config_username(name.trim_matches('"').to_string());
+                let msg = GitRunner::git_config_username(name.trim_matches('"').to_string());
                 return msg;
             }
         }
 		
 		if input.starts_with("git config user.email") {
             if let Some(email) = input.strip_prefix("git config user.email ") {
-                let msg = self.git_runner.as_mut().unwrap().git_config_email(email.trim_matches('"').to_string());
+                let msg = GitRunner::git_config_email(email.trim_matches('"').to_string());
                 return msg;
             }
         }
