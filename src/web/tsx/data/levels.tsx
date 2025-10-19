@@ -35,23 +35,27 @@ export default [
         title: "Enable Tracking",
         details: (<>
         This is important for us to proceded. I need to track you............r files.
-        There's a file called "addme.txt" in the directory you're currently in &lp;and can't leave&rp;.
+        There's a file called "addme.txt" in the directory you're currently in &lpar;and can't leave&rpar;.
         I need you track that file down. Some also call this staging, adding, or snapshotting. 
         </>),
-        successCaptureSequence: [/.*?/],
+        successCaptureSequence: [/File write succeeded.*addme.txt/],
     },
     {
         number: 3,
         title: "Commit to Something.",
         details: (<>
-        
+        In Git, A "commit" is a "permanent" snapshot in the version history of a repository.
+        These snapshots are the basis of Git, the idea being that you can return or build upon them at any time.
+        I need you to commit your saved snapshot with a custom note.
         </>),
         successCaptureSequence: [/.*?/],
     },
     {
         number: 4,
-        title: "Level 4",
-        details: (<></>),
+        title: "Branch Out.",
+        details: (<>
+        Branches are like parallel timelines for your repository. At any point, you can split off from the current state of your repository
+        </>),
         successCaptureSequence: [/.*?/],
     },
     {
