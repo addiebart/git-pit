@@ -48,20 +48,28 @@ export default [
         These snapshots are the basis of Git, the idea being that you can return or build upon them at any time.
         I need you to commit your saved snapshot with a custom note.
         </>),
-        successCaptureSequence: [/.*?/],
+        successCaptureSequence: [/Commit succeeded/],
     },
     {
         number: 4,
         title: "Branch Out.",
         details: (<>
-        Branches are like parallel timelines for your repository. At any point, you can split off from the current state of your repository
+        Branches are like parallel timelines for your repository. 
+        At any point, you can split off from the current state of your repository to work an alternate timeline.
+        This in helpful you want to have a quick and easy way to revert your changes,
+        or if you're working in a group and multiple people want to work at the same time without steping on each other's toes.
+        Create a new branch called "branchtwo" <span className="font-semibold italic">without switching to it.</span>
         </>),
-        successCaptureSequence: [/.*?/],
+        successCaptureSequence: [/Created branch 'branchtwo'/],
     },
     {
         number: 5,
-        title: "Level 5",
-        details: (<></>),
+        title: "Thanks for Your Purchase.",
+        details: (<>
+        The checkout command allows you to switch to another active branch. 
+        You can also use "git checkout -b &lt;branchname&gt;" to create a branch and switch to it in one step.
+        Switch your active branch to the one you created in the previous task.
+        </>),
         successCaptureSequence: [/.*?/],
     },
     {

@@ -1,6 +1,8 @@
 build
 exclude
 dist
+repo
+remote
 
 .DS_Store
 node_modules
