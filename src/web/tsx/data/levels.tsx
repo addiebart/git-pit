@@ -21,20 +21,31 @@ export default [
     },
     {
         number: 1,
-        title: "Level 1",
-        details: (<></>),
-        successCaptureSequence: [/.*?/],
+        title: "Introduce Yourself.",
+        details: (<>
+        Thanks for getting us started. I'm excited for us to learn how to use Git together.
+        I'm an abstract sentient being designed to sound vaguely human, but you probably have a name.
+        I don't really care what it is, but I do care that you know how to tell me what it is.
+        Also, let's keep it between you and me. <span className="font-semibold italic">the rest of the globe doesn't need to know.</span>
+        </>),
+        successCaptureSequence: [/Updated git username/],
     },
     {
         number: 2,
-        title: "Level 2",
-        details: (<></>),
+        title: "Enable Tracking",
+        details: (<>
+        This is important for us to proceded. I need to track you............r files.
+        There's a file called "addme.txt" in the directory you're currently in &lp;and can't leave&rp;.
+        I need you track that file down. Some also call this staging, adding, or snapshotting. 
+        </>),
         successCaptureSequence: [/.*?/],
     },
     {
         number: 3,
-        title: "Level 3",
-        details: (<></>),
+        title: "Commit to Something.",
+        details: (<>
+        
+        </>),
         successCaptureSequence: [/.*?/],
     },
     {
