@@ -1,30 +1,23 @@
 //git.rs (Facilitating git calls to backend using smol)
 use git2::{Repository, Error, ResetType, StatusOptions};
 
-pub struct GitRunner{
-	command_queue: Vec<String>,
-	repo: Repository
-}
+pub struct GitRunner;
 
-pub struct Parser{
-	pub git_runner: Option<GitRunner>
-	
-}
+pub struct Parser;
 
 impl GitRunner{
 	//init will create a repo
-	pub fn init() -> (String, Self){
+	pub fn init() -> String{
 		//making dir
 		let dir = std::path::Path::new("repo");
 
 		if let Err(e) = std::fs::create_dir_all(&dir){
-			//return format!("failed to create dir: {}", e);
+			return format!("failed to create dir: {}", e);
 		} 
 		//making repo
 		match Repository::init(&dir){
-			Ok(repo) => ("Repo initialized: 201".to_string(), Self{command_queue: Vec::new(), repo: repo}),
-			//Err(err) => format!("git init failed: {}", err),
-			_ => {panic!("no.")}
+			Ok(repo) => "Repo initialized: 201".to_string(),
+			Err(err) => format!("git init failed: {}", err),
 		}
 	}
 	//uninit deletes the repo directory (and therefore the repo) (ran on game end)
@@ -256,8 +249,7 @@ impl GitRunner{
 
 impl Parser{
 	pub fn new()-> Self{
-		
-		Self{git_runner: None}
+		Self
 	}
 	
 	pub fn parse(&mut self, input: String) -> String{
@@ -269,8 +261,7 @@ impl Parser{
 		//seeing what thing you're calling
 		match input.as_str() {
 			"git init" => {
-				let (msg, new) = GitRunner::init(); // just returns String now
-				self.git_runner = Some(new);
+				let msg = GitRunner::init(); // just returns String now
 				return msg;
 			},
 			_ => {},
