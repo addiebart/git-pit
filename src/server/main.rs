@@ -67,14 +67,13 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 				let ctx = WebSocketContext::new(sec_key);
 				let (sign, ws) = ctx.on_upgrade(
 					move |mut conn: Connection<TcpStream>| async move {
-						let mut parser = Parser::new();
 						while let Ok(Some(msg)) = conn.recv().await {
 							match msg {
 								Message::Text(text) => {
 									println!("Recieved text from {addr}: {text}");
 									//this is where you'd call worker function, then send back to addr
 									//call gitrunner
-									let message: String = parser.parse(text.to_string());
+									let message: String = Parser::parse(text.to_string());
 									//Success/Failure should then be sent over to the JS/HTML
 									if conn.send(Message::Text(format!("{message}").into())).await.is_err() {
 										println!("Failed to send message to {addr}");
@@ -86,7 +85,9 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 								}
 								Message::Close(close) => {
 									println!("Client {addr} disconnected");
-									GitRunner::uninit();
+									match GitRunner::uninit(){
+										_ => {}
+									}
 									break;
 								}
 								_ => {}

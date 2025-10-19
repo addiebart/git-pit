@@ -22,8 +22,7 @@ impl GitRunner{
 	}
 	//uninit deletes the repo directory (and therefore the repo) (ran on game end)
 	pub fn uninit() -> std::io::Result<()>{
-		std::fs::remove_dir_all("repo")?;
-		Ok(())
+		std::fs::remove_dir_all("repo")
 	}
 	
 	//git config username will change the users name 
@@ -48,33 +47,46 @@ impl GitRunner{
 
 	//we adding
 	pub fn git_add (filename: String) -> String{
-		let mut repo = Repository::open("repo");
-		let mut index = repo.as_mut().expect("fatal error").index();
-		match filename.as_str() {
-			"." => {
-				let mut status_opts = StatusOptions::new();
-				let statuses = repo.as_mut().expect("fatal error").statuses(Some(&mut status_opts)).expect("poop");
-				for entry in statuses.iter() {
-					if let Some(path) = entry.path() {
-						match &mut index.as_mut().expect("fatal error").add_path(std::path::Path::new(path)) {
-							Ok(_) => println!("'add' succeeded: 200, path: {:?}", path),
-							Err(e) => return format!("Failed to add: {}", e),
+		match Repository::open("repo"){
+			Ok(repo) => {
+					match repo.index(){
+					Ok(mut index) => {
+						match filename.as_str() {
+							"." => {
+								let mut status_opts = StatusOptions::new();
+								match repo.statuses(Some(&mut status_opts)){
+									Ok(statuses) => {
+										for entry in statuses.iter() {
+											if let Some(path) = entry.path() {
+												match &mut index.add_path(std::path::Path::new(path)) {
+													Ok(_) => println!("'add' succeeded: 200, path: {:?}", path),
+													Err(e) => return format!("Failed to add: {}", e),
+												}
+											}
+										}
+									},
+									Err(e) => return format!("Failed to obtain status information: {}", e),
+								};
+							},
+							_ => { 
+								match index.add_path(std::path::Path::new(&filename)){
+									Ok(path) => println!("'add' succeeded: 200, path: {:?}", path),
+									Err(e) => return format!("Failed to add: {}", e),
+									
+								}
+							}
 						}
-					}
-				}
-			},
-			_ => { 
-				match index.as_mut().expect("fatal error").add_path(std::path::Path::new(&filename)){
-					Ok(path) => println!("'add' succeeded: 200, path: {:?}", path),
-					Err(e) => return format!("Failed to add: {}", e),
-					
-				}
+						match index.write(){
+							Ok(path) => "File write succeeded: 200".to_string(),
+							Err(e) => format!("File write failed: {}", e),
+						}
+					},
+						
+					Err(e) => return format!("Failed to get index file: {}", e)
+				}	
 			}
+			Err(e) => return format!("Failed to open repo: {}", e)
 		}
-		match index.expect("fatal error").write(){
-			Ok(path) => "File write succeeded: 200".to_string(),
-			Err(e) => format!("File write failed: {}", e),
-		}	
 	}
 	
 	//we commiting
@@ -248,11 +260,8 @@ impl GitRunner{
 }
 
 impl Parser{
-	pub fn new()-> Self{
-		Self
-	}
 	
-	pub fn parse(&mut self, input: String) -> String{
+	pub fn parse(input: String) -> String{
 		//make sure str starts with git
 		if !input.starts_with("git"){
 			return String::from("Non-git command: 400");
