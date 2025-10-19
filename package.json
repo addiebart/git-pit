@@ -1,5 +1,5 @@
 {
-  "name": "git-pit",
+  "name": "git-smart",
   "version": "1.0.0",
   "description": "A Git-based educational game for HackKState 2025",
   "main": "main.js",
