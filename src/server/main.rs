@@ -16,7 +16,6 @@ fn main() -> std::io::Result<()> {
 			println!("New tcp connection from {addr}");
 			smol::spawn(handle_connection(stream, addr)).detach();
         }
-		GitRunner::uninit();
 	})
 }
 
@@ -68,7 +67,6 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 				let ctx = WebSocketContext::new(sec_key);
 				let (sign, ws) = ctx.on_upgrade(
 					move |mut conn: Connection<TcpStream>| async move {
-						println!("test");
 						let mut parser = Parser::new();
 						while let Ok(Some(msg)) = conn.recv().await {
 							match msg {
@@ -88,13 +86,13 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 								}
 								Message::Close(close) => {
 									println!("Client {addr} disconnected");
+									GitRunner::uninit();
 									break;
 								}
 								_ => {}
 							}
 							Timer::after(Duration::from_secs(1));
 						}
-						println!("what");
 					}
 				);
 				/* this would be cute to use if possible
