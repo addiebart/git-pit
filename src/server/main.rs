@@ -6,8 +6,17 @@ mod structs;
 use structs::git::{Parser, GitRunner};
 use http::{HeaderMap, Request, HeaderName, HeaderValue, request::Builder, Version, Method, StatusCode, Response};
 use mews::{WebSocketContext, WebSocket, Connection, Message};
+use http_handle::Server;
 
 fn main() -> std::io::Result<()> {
+    let server = Server::new("127.0.0.1:8080", "./build/web");
+	
+    // Run the server in a separate thread so it doesn't block
+    let server_handle = std::thread::spawn(move || {
+        server.start().expect("Server failed to start");
+    });
+
+    println!("Server has been running for 2 seconds, shutting down...");
     smol::block_on(async {
         let listener = TcpListener::bind("127.0.0.1:8081").await?;
         println!("Websocket server listening @ {:?}", listener.local_addr());
@@ -16,7 +25,11 @@ fn main() -> std::io::Result<()> {
 			println!("New tcp connection from {addr}");
 			smol::spawn(handle_connection(stream, addr)).detach();
         }
-	})
+        Ok::<(), std::io::Error>(())
+	});
+	std::thread::sleep(Duration::from_secs(2));
+	println!("Server has been running for 2 seconds, shutting down...");
+	Ok(())
 }
 
 async fn parse_http(stream: &mut TcpStream) -> std::io::Result<Request<()>>{
