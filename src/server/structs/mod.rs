@@ -1,3 +1,5 @@
 //structs/mod.rs
 pub mod git;
-pub mod server;
+pub use git::*;
+pub mod parser;
+pub use parser::*;

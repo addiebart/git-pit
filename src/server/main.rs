@@ -1,7 +1,7 @@
 use smol::{io::{AsyncReadExt, Error, ErrorKind}, io::AsyncWriteExt, net::{TcpListener, TcpStream}, spawn, Timer};
 use std::time::Duration;
 mod structs;
-use structs::git::{Parser, GitRunner};
+use structs::{Parser, GitRunner};
 use http::{Request, HeaderName, HeaderValue, request::Builder, Version, Method}; //StatusCode, Response};
 use mews::{WebSocketContext, Connection, Message};
 use http_handle::Server;
