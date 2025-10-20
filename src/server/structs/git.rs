@@ -1,5 +1,5 @@
 //git.rs (Facilitating git calls to backend using smol)
-use git2::{Repository, Error, ResetType, StatusOptions, BranchType::{Local, Remote}, build::CheckoutBuilder};
+use git2::{Repository, StatusOptions}; //BranchType::{Local, Remote}, build::CheckoutBuilder};
 
 pub struct GitRunner;
 
@@ -25,7 +25,7 @@ impl GitRunner{
 			}
 		}
 		match Repository::init(&dir){
-			Ok(repo) => "Repo initialized: 201".to_string(),
+			Ok(_repo) => "Repo initialized: 201".to_string(),
 			Err(err) => format!("git init failed: {}", err),
 		}
 
@@ -93,7 +93,7 @@ impl GitRunner{
 			}
 		}
 		match index.write(){
-			Ok(path) => format!("File write succeeded: 200 path: {}", filename),
+			Ok(_path) => format!("File write succeeded: 200 path: {}", filename),
 			Err(e) => format!("File write failed: {}", e),
 		}
 	}
@@ -132,7 +132,7 @@ impl GitRunner{
 					Err(e) => return format!("Failed to turn peel to commit: {}", e),
 				}
 			}
-			Err(e) => {
+			Err(_e) => {
 				match repo.commit(
 					Some("HEAD"), //update HEAD
 					&sig, //author

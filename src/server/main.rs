@@ -1,23 +1,21 @@
-use git2::Repository;
 use smol::{io::{AsyncReadExt, Error, ErrorKind}, io::AsyncWriteExt, net::{TcpListener, TcpStream}, spawn, Timer};
 use std::time::Duration;
-use smol::prelude::*;
 mod structs;
 use structs::git::{Parser, GitRunner};
-use http::{HeaderMap, Request, HeaderName, HeaderValue, request::Builder, Version, Method, StatusCode, Response};
-use mews::{WebSocketContext, WebSocket, Connection, Message};
+use http::{Request, HeaderName, HeaderValue, request::Builder, Version, Method}; //StatusCode, Response};
+use mews::{WebSocketContext, Connection, Message};
 use http_handle::Server;
 
 fn main() -> std::io::Result<()> {
-    let server = Server::new("127.0.0.1:8080", "./build/web");
+  let server = Server::new("127.0.0.1:8080", "./build/web");
 	
     // Run the server in a separate thread so it doesn't block
-    let server_handle = std::thread::spawn(move || {
+	let _server_handle = std::thread::spawn(move || {
         server.start().expect("Server failed to start");
     });
 
-    println!("Server has been running for 2 seconds, shutting down...");
-    smol::block_on(async {
+  println!("Server has been running for 2 seconds, shutting down...");
+    let _ = smol::block_on::<std::io::Result<()>>(async {
         let listener = TcpListener::bind("127.0.0.1:8081").await?;
         println!("Websocket server listening @ {:?}", listener.local_addr());
         loop {
@@ -25,7 +23,6 @@ fn main() -> std::io::Result<()> {
 			println!("New tcp connection from {addr}");
 			smol::spawn(handle_connection(stream, addr)).detach();
         }
-        Ok::<(), std::io::Error>(())
 	});
 	std::thread::sleep(Duration::from_secs(2));
 	println!("Server has been running for 2 seconds, shutting down...");
@@ -34,7 +31,7 @@ fn main() -> std::io::Result<()> {
 
 async fn parse_http(stream: &mut TcpStream) -> std::io::Result<Request<()>>{
 	let mut buffer: [u8; 2048] = [0u8; 2048];
-	let buffer_size: usize = stream.read(&mut buffer).await?;
+	let _buffer_size: usize = stream.read(&mut buffer).await?;
 	//split buffer somehow
 	let request_text: String = std::str::from_utf8(&buffer).unwrap().to_string();
 	let mut lines = request_text.split("\r\n");
@@ -69,7 +66,7 @@ async fn parse_http(stream: &mut TcpStream) -> std::io::Result<Request<()>>{
 	}else{
 		return Err(Error::new(ErrorKind::NotFound, "Builder had error!"));
 	}
-	req.body(()).map_err(|e| Error::new(ErrorKind::NotFound, "Builder error when trying to make request!"))
+	req.body(()).map_err(|_e| Error::new(ErrorKind::NotFound, "Builder error when trying to make request!"))
 }
 
 async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) -> std::io::Result<()>{
@@ -96,7 +93,7 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 								Message::Binary(bin) => {
 									println!("Recieved binary from {addr}: {bin:?}");
 								}
-								Message::Close(close) => {
+								Message::Close(_close) => {
 									println!("Client {addr} disconnected");
 									match GitRunner::uninit(){
 										_ => {}
@@ -118,7 +115,7 @@ async fn handle_connection(mut stream: TcpStream, addr: std::net::SocketAddr) ->
 					.body(())
 					.unwrap();
 				*/
-				let mut resp_str = format!(
+				let resp_str = format!(
 					"HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: {}\r\n\r\n",
 					sign
 				);
