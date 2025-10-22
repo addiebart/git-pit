@@ -170,7 +170,7 @@ impl GitRunner{
 		Ok(())
 	}
 	
-	/* gay
+	/* Hey, Lily!
 	pub fn pull(&mut self) -> Result<(), Error> {
 		let repo = Repository::open(".")?;
 
@@ -219,7 +219,7 @@ impl GitRunner{
 	}
 	*/
 
-	/* also gay ill deal with it later 
+	/* also Hey, Lily! ill deal with it later 
 	pub fn git_clone(&mut self, url: String) -> Result<(), Error> {
 		Ok(())
 			

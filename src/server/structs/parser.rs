@@ -6,11 +6,26 @@ pub struct Parser;
 impl Parser{
 	
 	pub fn parse(input: String) -> String{
+		/*
+		let str_iter = input.split_ascii_whitespace();//replace with some kinda function because bash doesn't allow \n and \t 
 		//make sure str starts with git
-		if !input.starts_with("git"){
+		if str_iter.next() != Some("git"){
 			return String::from("Non-git command: 400");
 		}
-		
+		let command = match str_iter.next(){
+			Some(c) => c
+			None => return String::from("Git command not specified: 400");
+		}
+		match &command {
+			"init" => GitRunner::init(str_iter.remainder()),
+			"config" => GitRunner::config(str_iter.remainder()),
+			"branch" => GitRunner::config(str_iter.remainder()),
+			"checkout" => GitRunner::config(str_iter.remainder()),
+			"add" => GitRunner::config(str_iter.remainder()),
+			"commit" => GitRunner::config(str_iter.remainder()),
+			e => return format!("Did you mean {}", e)
+		}
+		*/
 		//seeing what thing you're calling
 		match input.as_str() {
 			"git init" => {
