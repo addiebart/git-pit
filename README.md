@@ -19,6 +19,7 @@ The next steps would be to add more advanced challenges for users to complete. C
 - Ensure node is installed on your system. It can be installed from here: https://nodejs.org/en/download
 - Clone, or download and extract, this repository: `git clone https://github.com/git-smart-hackkstate/git-smart.git`
 - cd into the repository: `cd git-smart`
+- Run: ./script/build.sh or ./script/build.ps1 (Powershell). OR
 - Build the backend: `cargo build --release`
 - Install dependencies for the frontend `npm install`
 - Build the frontend: `npm run build`
